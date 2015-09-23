@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>kr.ac.kaist.ds.groupd</groupId>
+  <artifactId>ReliableADGSASimulation</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>net.sourceforge.peersim</groupId>
+  		<artifactId>peersim</artifactId>
+  		<version>1.0.5</version>
+  		<scope>system</scope>
+  		<systemPath>${project.basedir}/src/main/resources/lib/peersim-1.0.5/peersim-1.0.5.jar</systemPath>
+  	</dependency>
+  	<dependency>
+  		<groupId>edu.msu.cse</groupId>
+  		<artifactId>jep</artifactId>
+  		<version>2.3.0</version>
+  		<scope>system</scope>
+  		<systemPath>${project.basedir}/src/main/resources/lib/peersim-1.0.5/jep-2.3.0.jar</systemPath>
+  	</dependency>
+  	<dependency>
+  		<groupId>edu.msu.cse</groupId>
+  		<artifactId>djep</artifactId>
+  		<version>1.0.0</version>
+  		<scope>system</scope>
+  		<systemPath>${project.basedir}/src/main/resources/lib/peersim-1.0.5/djep-1.0.0.jar</systemPath>
+  	</dependency>
+  </dependencies>
+</project>
