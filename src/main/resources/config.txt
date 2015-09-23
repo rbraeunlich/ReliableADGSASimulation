@@ -1,35 +1,34 @@
-# PEERSIM EXAMPLE 1
-
 random.seed 1234567890
 simulation.cycles 30
 
-# visit nodes in random order each cycle
 control.shf Shuffle
 
-network.size 50000
+network.size 10
 
+################### protocols ===========================
 
 protocol.lnk IdleProtocol
 
-protocol.avg example.aggregation.AverageFunction
-protocol.avg.linkable lnk
+protocol.token TokenProtocol
+protocol.token.linkable lnk
+
+################### initialization ======================
 
 init.rnd WireKOut
 init.rnd.protocol lnk
 # degree of nodes
 init.rnd.k 20
 
-init.peak example.aggregation.PeakDistributionInitializer
-init.peak.value 10000
-init.peak.protocol avg
+init.vals LinearDistribution
+init.vals.protocol token
+init.vals.max 100
+init.vals.min 1
 
-init.lin LinearDistribution
-init.lin.protocol avg
-init.lin.max 100
-init.lin.min 1
+init.tok TokenInitializer
+init.tok.protocol token
+init.tok.number 2
 
-# you can change this to select the peak initializer instead
-include.init rnd
+################ control ==============================
 
-control.avgo example.aggregation.AverageObserver
-control.avgo.protocol avg
+control.0 TokenObserver
+control.0.protocol token
