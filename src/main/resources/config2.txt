@@ -1,0 +1,32 @@
+simulation.cycles 1
+network.size 1000
+
+################### protocols ===========================
+
+protocol.link IdleProtocol
+
+protocol.interest InterestProtocol
+
+################### initialization ======================
+
+#init.0 WireKOut
+#init.0.protocol link
+# degree of nodes
+#init.0.k 20
+
+init.1 kr.ac.kaist.ds.groupd.topology.InterestTopology
+init.1.protocol link
+init.1.interest_protocol interest
+init.1.coeff 0.9
+init.1.candVotes 5
+init.1.repThreshold 10
+init.1.undir
+
+################ control ==============================
+
+control.degree DegreeStats
+control.degree.protocol interest
+control.degree.undir
+control.degree.method list
+
+include.control degree
