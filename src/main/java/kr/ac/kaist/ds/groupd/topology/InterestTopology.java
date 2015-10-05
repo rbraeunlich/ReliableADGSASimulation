@@ -8,6 +8,9 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.vector.SparseVector;
+
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Node;
@@ -73,14 +76,24 @@ public class InterestTopology extends WireGraph {
 	}
 
 	private double calculateSimilarity(Node node, Node node2) {
-		//FIXME
 		InterestProtocol nodeProtocol = (InterestProtocol) node
 				.getProtocol(pid);
 		InterestProtocol node2Protocol = (InterestProtocol) node2
 				.getProtocol(pid);
-		nodeProtocol.getInterest();
-		node2Protocol.getInterest();
-		return CommonState.r.nextDouble();
+		SparseVector<Real> interest = nodeProtocol.getInterest();
+		SparseVector<Real> interest2 = node2Protocol.getInterest();
+		Real dotProduct = interest.times(interest2);
+		Double magnitude = calculateMagnitude(interest);
+		Double magnitude2 = calculateMagnitude(interest);
+		return dotProduct.doubleValue() / (magnitude * magnitude2);
+	}
+
+	private Double calculateMagnitude(SparseVector<Real> interest) {
+		Double sum = 0.0;
+		for(int i = 0; i < interest.getDimension(); i++){
+			sum += Math.pow(interest.get(i).doubleValue(), 2.0);
+		}
+		return Math.sqrt(sum);
 	}
 
 	private void createGlobalCommunities(Graph g) {

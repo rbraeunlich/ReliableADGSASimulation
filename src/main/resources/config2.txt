@@ -1,5 +1,6 @@
 simulation.cycles 1
-network.size 1000
+#the number of users in the movielens 1 mio. dataset
+network.size 6040
 
 ################### protocols ===========================
 
@@ -9,10 +10,8 @@ protocol.interest InterestProtocol
 
 ################### initialization ======================
 
-#init.0 WireKOut
-#init.0.protocol link
-# degree of nodes
-#init.0.k 20
+init.0 InterestInitializer
+init.0.protocol interest
 
 init.1 kr.ac.kaist.ds.groupd.topology.InterestTopology
 init.1.protocol link

@@ -2,8 +2,10 @@ package kr.ac.kaist.ds.groupd.topology;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+
+import org.jscience.mathematics.number.Real;
+import org.jscience.mathematics.vector.SparseVector;
 
 import peersim.core.Linkable;
 import peersim.core.Node;
@@ -15,12 +17,13 @@ public class InterestProtocol implements Protocol, Linkable {
 	private int candidateVotes = 0;
 	private int representativeVotes;
 	private Node representative;
+	private SparseVector<Real> interestVector;
 
 	public InterestProtocol(String prefix) {
 	}
 
-	public List<String> getInterest() {
-		return Collections.emptyList();
+	public SparseVector<Real> getInterest() {
+		return interestVector;
 	}
 
 	@Override
@@ -96,5 +99,9 @@ public class InterestProtocol implements Protocol, Linkable {
 
 	@Override
 	public void pack() {
+	}
+
+	public void setInterestVector(SparseVector<Real> interestVector) {
+		this.interestVector = interestVector;
 	}
 }
