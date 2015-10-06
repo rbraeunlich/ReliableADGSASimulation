@@ -34,35 +34,54 @@ public class InterestInitializer implements Control {
 
 	@Override
 	public boolean execute() {
-		URL ratingsFile = this.getClass().getClassLoader().getResource("kr/ac/kaist/ds/groupd/topology/ratings.dat");
-		URL moviesFile = this.getClass().getClassLoader().getResource("kr/ac/kaist/ds/groupd/topology/movies.dat");
+		URL ratingsFile = this.getClass().getClassLoader()
+				.getResource("kr/ac/kaist/ds/groupd/topology/ratings.dat");
+		URL moviesFile = this.getClass().getClassLoader()
+				.getResource("kr/ac/kaist/ds/groupd/topology/movies.dat");
 		Collection<Movie> movies = new MovieParser(moviesFile).parseMovies();
-		Collection<Rating> ratings = new RatingParser(movies, ratingsFile).parseRatings();
-		for(int i = 0; i < Network.size(); i++){
+		Collection<Rating> ratings = new RatingParser(movies, ratingsFile)
+				.parseRatings();
+		for (int i = 0; i < Network.size(); i++) {
 			int j = i;
-			List<Rating> filteredRatings = ratings.stream().filter(r -> r.getUserId() == j).collect(Collectors.toList());
+			List<Rating> filteredRatings = ratings.stream()
+					.filter(r -> r.getUserId() == j)
+					.collect(Collectors.toList());
 			SparseVector<Real> interestVector = createInterestVector(filteredRatings);
-			InterestProtocol protocol = (InterestProtocol) Network.get(i).getProtocol(pid);
+			InterestProtocol protocol = (InterestProtocol) Network.get(i)
+					.getProtocol(pid);
 			protocol.setInterestVector(interestVector);
 		}
 		return false;
 	}
 
-	private SparseVector<Real> createInterestVector(List<Rating> filteredRatings) {
-		List<Genre> genreList = new ArrayList<Genre>(Arrays.asList(Genre.values()));
-		Map<Index, Real> ratings = genreList.stream().collect(Collectors.toMap(g -> Index.valueOf(g.ordinal()), g -> Real.ZERO));
-		//FIXME I am unsure if averaging is the best way
+	protected SparseVector<Real> createInterestVector(List<Rating> filteredRatings) {
+		List<Genre> genreList = new ArrayList<Genre>(Arrays.asList(Genre
+				.values()));
+		Map<Index, Real> ratings = genreList.stream().collect(
+				Collectors.toMap(g -> Index.valueOf(g.ordinal()),
+						g -> Real.ZERO));
+		Map<Index, Long> madeRatingsPerGenre = genreList.stream().collect(
+				Collectors.toMap(g -> Index.valueOf(g.ordinal()), g -> 0L));
+		// FIXME I am unsure if averaging is the best way
 		for (Rating rating : filteredRatings) {
 			Set<Genre> genres = rating.getMovie().getGenres();
 			for (Genre genre : genres) {
-				Real r = ratings.get(Index.valueOf(genre.ordinal()));
-				ratings.put(Index.valueOf(genre.ordinal()), r.plus(Real.valueOf(rating.getRating())));
+				Index genreIndex = Index.valueOf(genre.ordinal());
+				Real r = ratings.get(genreIndex);
+				Long counter = madeRatingsPerGenre.get(genreIndex);
+				ratings.put(genreIndex,
+						r.plus(Real.valueOf(rating.getRating())));
+				madeRatingsPerGenre.put(genreIndex, counter + 1L);
 			}
 		}
-		//FIXME the average is wrong, I should only average for the actual genres seen
-		//I divide by all ratings, but if he only once saw comedy for example it will be 5/100, which is wrong
-		ratings.replaceAll((k, v) -> v.divide(filteredRatings.size()));
-		SparseVector<Real> vector = SparseVector.valueOf(Genre.values().length, Real.ZERO, ratings);
+		ratings.replaceAll((k, v) -> {
+			if (madeRatingsPerGenre.get(k) == 0L) {
+				return Real.ZERO;
+			}
+			return v.divide(madeRatingsPerGenre.get(k));
+		});
+		SparseVector<Real> vector = SparseVector.valueOf(Genre.values().length,
+				Real.ZERO, ratings);
 		return vector;
 	}
 

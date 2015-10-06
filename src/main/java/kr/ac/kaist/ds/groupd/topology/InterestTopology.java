@@ -12,7 +12,6 @@ import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.SparseVector;
 
 import peersim.config.Configuration;
-import peersim.core.CommonState;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
 import peersim.graph.Graph;

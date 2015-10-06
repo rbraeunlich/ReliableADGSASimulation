@@ -5,8 +5,6 @@ import peersim.config.FastConfig;
 import peersim.core.CommonState;
 import peersim.core.Linkable;
 import peersim.core.Node;
-import peersim.core.Protocol;
-import peersim.transport.Transport;
 import peersim.vector.SingleValueHolder;
 
 public class TokenProtocol extends SingleValueHolder implements CDProtocol {
