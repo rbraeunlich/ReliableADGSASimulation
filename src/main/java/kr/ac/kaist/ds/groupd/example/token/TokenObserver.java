@@ -1,5 +1,7 @@
 package kr.ac.kaist.ds.groupd.example.token;
 
+import java.util.ArrayList;
+
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
@@ -26,7 +28,9 @@ public class TokenObserver implements Control {
 						+ Network.get(i).getID());
 				protocol.resetToken();
 			}
+			protocol.clearQueue();
 		}
+		
 		return false;
 	}
 
