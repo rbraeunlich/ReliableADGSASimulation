@@ -4,6 +4,7 @@ import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
 import peersim.core.CommonState;
 import peersim.core.Linkable;
+import peersim.core.Network;
 import peersim.core.Node;
 import peersim.vector.SingleValueHolder;
 
@@ -29,10 +30,12 @@ public class TokenProtocol extends SingleValueHolder implements CDProtocol {
 			Linkable linkable = (Linkable) node.getProtocol(FastConfig
 					.getLinkable(pid));
 			int degree = linkable.degree();
-			// get a random neighbour
-			Node neighbor = linkable.getNeighbor(CommonState.r.nextInt(degree));
+			Node neighbor = linkable.getNeighbor(CommonState.r.nextInt(degree));  //randomal 하게 연결된 node로부터 token을 받아왔음 ㅇㅋ
 			TokenProtocol protocol = (TokenProtocol) neighbor.getProtocol(pid);
 			protocol.setToken(true);
+			
+			System.out.println(" pre: "+node.getID()+" now: "+neighbor.getID());
+			
 			resetToken();
 		}
 

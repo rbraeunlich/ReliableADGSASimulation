@@ -24,6 +24,7 @@ public class TokenInitializer implements Control {
 	@Override
 	public boolean execute() {
 		int size = Network.size();
+		System.out.println("node ToTal Network Size : "+size);
 		for (int i = 0; i < number; i++) {
 			Node node = Network.get(CommonState.r.nextInt(size));
 			TokenProtocol protocol = (TokenProtocol) node.getProtocol(pid);
