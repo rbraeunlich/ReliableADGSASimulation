@@ -1,5 +1,6 @@
 package kr.ac.kaist.ds.groupd.example.token;
 
+import kr.ac.kaist.ds.groupd.UI.visualWindow;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Control;
@@ -23,6 +24,11 @@ public class TokenInitializer implements Control {
 
 	@Override
 	public boolean execute() {
+
+		// show Visual Window
+		visualWindow Window = new visualWindow();
+		Window.show();
+		
 		int size = Network.size();
 		System.out.println("node ToTal Network Size : "+size);
 		for (int i = 0; i < number; i++) {
