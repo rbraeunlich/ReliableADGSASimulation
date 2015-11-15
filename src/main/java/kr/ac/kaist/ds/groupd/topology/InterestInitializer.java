@@ -34,6 +34,7 @@ public class InterestInitializer implements Control {
 
 	@Override
 	public boolean execute() {
+		System.out.println("Start");
 		URL ratingsFile = this.getClass().getClassLoader()
 				.getResource("kr/ac/kaist/ds/groupd/topology/ratings.dat");
 		URL moviesFile = this.getClass().getClassLoader()

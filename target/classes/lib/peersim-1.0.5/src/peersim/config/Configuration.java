@@ -29,7 +29,7 @@ import java.util.*;
  * read property values based on their names.
  * <p>
  * The design of this class also hides the actual implementation of the
- * configuration which can be Properties, XML, whatever. Currently only
+ * configuration wh	ich can be Properties, XML, whatever. Currently only
  * Properties is supported.
  * <p>
  * Apart from storing (name,value) pairs, this class also does some

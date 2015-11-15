@@ -40,8 +40,9 @@ public class TokenProtocol extends SingleValueHolder implements CDProtocol {
 			Linkable linkable = (Linkable) node.getProtocol(FastConfig
 					.getLinkable(pid));
 			int degree = linkable.degree();
-			Node neighbor = linkable.getNeighbor(CommonState.r.nextInt(degree));  //randomal 하게 연결된 node로부터 token을 받아왔음 ㅇㅋ
+			Node neighbor = linkable.getNeighbor(0);  
 			TokenProtocol protocol = (TokenProtocol) neighbor.getProtocol(pid);
+			
 			protocol.setToken(true);
 			
 			for( int i =0 ; i < alResultQueue.size(); i++)

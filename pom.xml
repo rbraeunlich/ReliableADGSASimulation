@@ -11,7 +11,11 @@
 			<version>1.0.5</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/src/main/resources/lib/peersim-1.0.5/peersim-1.0.5.jar</systemPath>
-		</dependency>
+		</dependency><dependency>
+    <groupId>org.jfree</groupId>
+    <artifactId>jfreechart</artifactId>
+    <version>1.0.19</version>
+</dependency>
 		<dependency>
 			<groupId>edu.msu.cse</groupId>
 			<artifactId>jep</artifactId>
