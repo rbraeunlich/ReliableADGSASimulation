@@ -3,7 +3,7 @@ simulation.cycles 30
 
 control.shf Shuffle
 
-network.size 10
+network.size 5
 
 ################### protocols ===========================
 
@@ -17,7 +17,7 @@ protocol.token.linkable lnk
 init.rnd WireKOut
 init.rnd.protocol lnk
 # degree of nodes
-init.rnd.k 20
+init.rnd.k 3
 
 init.vals LinearDistribution
 init.vals.protocol token

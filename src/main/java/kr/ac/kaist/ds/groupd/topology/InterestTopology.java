@@ -31,6 +31,38 @@ public class InterestTopology extends WireGraph {
 	private final int numberCandidateVotes;
 	private final int representativeThreshold;
 
+	@Override
+	public void wire(Graph g) {
+		System.out.println("start the wire");
+		createLocalCommunities(g);
+		createGlobalCommunities(g);
+		System.out.println("start the revote");
+		resetVotes(g);
+	}
+	
+	private void createLocalCommunities(Graph g) {
+		//since I do not know how to combine two Linkable protocols
+		//I use this workaround which assumes, that all nodes can see each other
+		for (int i = 0; i < g.size(); i++) {
+			Node node1 = (Node) g.getNode(i);
+			for (int j = i + 1; j < g.size(); j++) {
+				Node node2 = (Node) g.getNode(j);
+				double similarity = calculateSimilarity(node1, node2);
+				if (similarity > clusteringCoefficient) {
+					g.setEdge(i, j);
+					InterestProtocol nodeProtocol = (InterestProtocol) node1
+							.getProtocol(pid);
+					InterestProtocol node2Protocol = (InterestProtocol) node2
+							.getProtocol(pid);
+					nodeProtocol.addNeighbor(node2);
+					node2Protocol.addNeighbor(node1);
+					
+				}
+			}
+		}
+	}
+
+	
 	public InterestTopology(String prefix) {
 		super(prefix);
 		clusteringCoefficient = Configuration.getDouble(parName(prefix,
@@ -46,37 +78,6 @@ public class InterestTopology extends WireGraph {
 		return prefix + "." + parName;
 	}
 
-	@Override
-	public void wire(Graph g) {
-		System.out.println("start the wire");
-		createLocalCommunities(g);
-		createGlobalCommunities(g);
-		System.out.println("start the revote");
-		resetVotes(g);
-	}
-
-	private void createLocalCommunities(Graph g) {
-		//since I do not know how to combine two Linkable protocols
-		//I use this workaround which assumes, that all nodes can see each other
-		for (int i = 0; i < g.size(); i++) {
-			Node node1 = (Node) g.getNode(i);
-			for (int j = i + 1; j < g.size(); j++) {
-				Node node2 = (Node) g.getNode(j);
-				double similarity = calculateSimilarity(node1, node2);
-				if (similarity > clusteringCoefficient) {
-					g.setEdge(i, j);
-					System.out.println("edge : "+g.getEdge(i, j).toString());
-					InterestProtocol nodeProtocol = (InterestProtocol) node1
-							.getProtocol(pid);
-					InterestProtocol node2Protocol = (InterestProtocol) node2
-							.getProtocol(pid);
-					nodeProtocol.addNeighbor(node2);
-					node2Protocol.addNeighbor(node1);
-					
-				}
-			}
-		}
-	}
 
 	private double calculateSimilarity(Node node, Node node2) {
 		InterestProtocol nodeProtocol = (InterestProtocol) node
