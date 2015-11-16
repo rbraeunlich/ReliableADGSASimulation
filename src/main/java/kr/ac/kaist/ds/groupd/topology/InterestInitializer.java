@@ -22,6 +22,13 @@ import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
 
+/**
+ * Initialzer class that parses the movie and ratings files and assigns each
+ * node in the network it's interest vector, derived from the movie ratings. If
+ * there are more nodes in the network than users in the dataset, then the nodes
+ * that are too many will get an empty vector.
+ *
+ */
 public class InterestInitializer implements Control {
 
 	private static final String PAR_PROT = "protocol";
@@ -34,17 +41,12 @@ public class InterestInitializer implements Control {
 
 	@Override
 	public boolean execute() {
-		URL ratingsFile = this.getClass().getClassLoader()
-				.getResource("kr/ac/kaist/ds/groupd/topology/ratings.dat");
-		URL moviesFile = this.getClass().getClassLoader()
-				.getResource("kr/ac/kaist/ds/groupd/topology/movies.dat");
-		Collection<Movie> movies = new MovieParser(moviesFile).parseMovies();
-		Collection<Rating> ratings = new RatingParser(movies, ratingsFile)
-				.parseRatings();
+		Collection<Movie> movies = parseMovies();
+		Collection<Rating> ratings = parseRatings(movies);
 		for (int i = 0; i < Network.size(); i++) {
 			int j = i;
 			List<Rating> filteredRatings = ratings.stream()
-					.filter(r -> r.getUserId() == j)
+					.filter(r -> r.getUserId() == j + 1)
 					.collect(Collectors.toList());
 			SparseVector<Real> interestVector = createInterestVector(filteredRatings);
 			InterestProtocol protocol = (InterestProtocol) Network.get(i)
@@ -54,7 +56,30 @@ public class InterestInitializer implements Control {
 		return false;
 	}
 
-	protected SparseVector<Real> createInterestVector(List<Rating> filteredRatings) {
+	private Collection<Rating> parseRatings(Collection<Movie> movies) {
+		URL ratingsFile = this.getClass().getClassLoader()
+				.getResource("kr/ac/kaist/ds/groupd/topology/ratings.dat");
+		Collection<Rating> ratings = new RatingParser(movies, ratingsFile)
+				.parseRatings();
+		return ratings;
+	}
+
+	private Collection<Movie> parseMovies() {
+		URL moviesFile = this.getClass().getClassLoader()
+				.getResource("kr/ac/kaist/ds/groupd/topology/movies.dat");
+		Collection<Movie> movies = new MovieParser(moviesFile).parseMovies();
+		return movies;
+	}
+
+	/**
+	 * Creates a vector based on the ratings in the Movielens dataset.
+	 * For every gerne the user's average rating is calculated and placed in the vector.
+	 * The position inside the vector is determined by the ordinal inside {@link Genre}.
+	 * @param filteredRatings
+	 * @return
+	 */
+	protected SparseVector<Real> createInterestVector(
+			List<Rating> filteredRatings) {
 		List<Genre> genreList = new ArrayList<Genre>(Arrays.asList(Genre
 				.values()));
 		Map<Index, Real> ratings = genreList.stream().collect(

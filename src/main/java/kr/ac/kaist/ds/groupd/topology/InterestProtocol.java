@@ -40,6 +40,9 @@ public class InterestProtocol implements Protocol, Linkable {
 		return interestCommunity;
 	}
 
+	/**
+	 * Increases the candidate votes by one.
+	 */
 	public void receiveCandidateVote() {
 		candidateVotes++;
 	}
@@ -48,6 +51,9 @@ public class InterestProtocol implements Protocol, Linkable {
 		return candidateVotes;
 	}
 
+	/**
+	 * Increases the representative votes by one.
+	 */
 	public void receiveRepresentativeVote() {
 		representativeVotes++;
 	}
@@ -60,6 +66,10 @@ public class InterestProtocol implements Protocol, Linkable {
 		this.representative = node;
 	}
 
+	/**
+	 * Sets candidate and representative votings to zero.
+	 * Has to be called after an election finishes.
+	 */
 	public void resetVotes() {
 		candidateVotes = 0;
 		representativeVotes = 0;

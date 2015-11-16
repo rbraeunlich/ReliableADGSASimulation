@@ -53,6 +53,10 @@ public class InterestTopology extends WireGraph {
 		resetVotes(g);
 	}
 
+	/**
+	 * Creates the local community by creating edges between nodes whose similarity is
+	 * greater than the {@link #clusteringCoefficient}.
+	 */
 	private void createLocalCommunities(Graph g) {
 		//since I do not know how to combine two Linkable protocols
 		//I use this workaround which assumes, that all nodes can see each other
@@ -74,6 +78,13 @@ public class InterestTopology extends WireGraph {
 		}
 	}
 
+	/**
+	 * Calculates the similarity based on the cosine similarity. 
+	 * See <a href="https://en.wikipedia.org/wiki/Cosine_similarity">Wikipedia<a/>
+	 * @param node
+	 * @param node2
+	 * @return
+	 */
 	private double calculateSimilarity(Node node, Node node2) {
 		InterestProtocol nodeProtocol = (InterestProtocol) node
 				.getProtocol(pid);
@@ -87,6 +98,12 @@ public class InterestTopology extends WireGraph {
 		return dotProduct.doubleValue() / (magnitude * magnitude2);
 	}
 
+	/**
+	 * Calculates the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
+	 * of a vector.
+	 * @param interest
+	 * @return
+	 */
 	private Double calculateMagnitude(SparseVector<Real> interest) {
 		Double sum = 0.0;
 		for(int i = 0; i < interest.getDimension(); i++){
@@ -95,6 +112,9 @@ public class InterestTopology extends WireGraph {
 		return Math.sqrt(sum);
 	}
 
+	/**
+	 * Creates the global community by initiating the voting mechanism for candidates and representatives.
+	 */
 	private void createGlobalCommunities(Graph g) {
 		candidateSelectionAndVote(g);
 		potentialRepresentativeIndentification(g);
@@ -156,6 +176,9 @@ public class InterestTopology extends WireGraph {
 		}
 	}
 
+	/**
+	 * The candidate with the most votes will be selected as representative.
+	 */
 	private void actualRepresentativeElection(Graph g) {
 		// I will skip the special cases for now, see
 		// A peer-to-peer recommender system for self-emerging user communities
@@ -189,6 +212,10 @@ public class InterestTopology extends WireGraph {
 		}
 	}
 
+	/**
+	 * Wraps a graph with an {@link Iterable} to be able to use it inside a for-each loop.
+	 *
+	 */
 	private static class GraphIteratorWrapper implements Iterable<Node> {
 
 		private Graph g;
