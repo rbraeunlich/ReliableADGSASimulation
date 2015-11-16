@@ -1,3 +1,4 @@
+
 package kr.ac.kaist.ds.groupd.topology;
 
 import java.util.ArrayList;
@@ -13,95 +14,99 @@ import peersim.core.Protocol;
 
 public class InterestProtocol implements Protocol, Linkable {
 
-	private List<Node> interestCommunity = new ArrayList<Node>();
-	private int candidateVotes = 0;
-	private int representativeVotes;
-	private Node representative;
-	private SparseVector<Real> interestVector;
+    private List<Node> interestCommunity = new ArrayList<Node>();
 
-	public InterestProtocol(String prefix) {
-	}
+    private int candidateVotes = 0;
 
-	public SparseVector<Real> getInterest() {
-		return interestVector;
-	}
+    private int representativeVotes;
 
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private Node representative;
 
-	public Collection<Node> getInterestCommunity() {
-		return interestCommunity;
-	}
+    private SparseVector<Real> interestVector;
 
-	public void receiveCandidateVote() {
-		candidateVotes++;
-	}
+    public InterestProtocol(String prefix) {
+    }
 
-	public int getCandidateVotes() {
-		return candidateVotes;
-	}
+    public SparseVector<Real> getInterest() {
+        return interestVector;
+    }
 
-	public void receiveRepresentativeVote() {
-		representativeVotes++;
-	}
-	
-	public Integer getRepresentativeVotes(){
-		return representativeVotes;
-	}
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-	public void setRepresentative(Node node) {
-		this.representative = node;
-	}
+    public Collection<Node> getInterestCommunity() {
+        return interestCommunity;
+    }
 
-	public void resetVotes() {
-		candidateVotes = 0;
-		representativeVotes = 0;
-	}
+    public void receiveCandidateVote() {
+        candidateVotes++;
+    }
 
-	public Node getRepresentative() {
-		return representative;
-	}
+    public int getCandidateVotes() {
+        return candidateVotes;
+    }
 
-	@Override
-	public void onKill() {
-		//FIXME
-	}
+    public void receiveRepresentativeVote() {
+        representativeVotes++;
+    }
 
-	@Override
-	public int degree() {
-		return interestCommunity.size();
-	}
+    public Integer getRepresentativeVotes() {
+        return representativeVotes;
+    }
 
-	@Override
-	public Node getNeighbor(int i) {
-		return interestCommunity.get(i);
-	}
+    public void setRepresentative(Node node) {
+        this.representative = node;
+    }
 
-	@Override
-	public boolean addNeighbor(Node neighbour) {
-		if(contains(neighbour)){
-			return false;
-		}
-		return interestCommunity.add(neighbour);
-	}
+    public void resetVotes() {
+        candidateVotes = 0;
+        representativeVotes = 0;
+    }
 
-	@Override
-	public boolean contains(Node neighbor) {
-		return interestCommunity.contains(neighbor);
-	}
+    public Node getRepresentative() {
+        return representative;
+    }
 
-	@Override
-	public void pack() {
-	}
+    @Override
+    public void onKill() {
+        // FIXME
+    }
 
-	public void setInterestVector(SparseVector<Real> interestVector) {
-		this.interestVector = interestVector;
-	}
+    @Override
+    public int degree() {
+        return interestCommunity.size();
+    }
+
+    @Override
+    public Node getNeighbor(int i) {
+        return interestCommunity.get(i);
+    }
+
+    @Override
+    public boolean addNeighbor(Node neighbour) {
+        if (contains(neighbour)) {
+            return false;
+        }
+        return interestCommunity.add(neighbour);
+    }
+
+    @Override
+    public boolean contains(Node neighbor) {
+        return interestCommunity.contains(neighbor);
+    }
+
+    @Override
+    public void pack() {
+    }
+
+    public void setInterestVector(SparseVector<Real> interestVector) {
+        this.interestVector = interestVector;
+    }
 }
