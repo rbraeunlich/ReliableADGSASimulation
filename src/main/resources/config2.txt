@@ -1,6 +1,6 @@
 simulation.cycles 1
 #the number of users in the movielens 1 mio. dataset
-network.size 50
+network.size 6040
 
 ################### protocols ===========================
 
