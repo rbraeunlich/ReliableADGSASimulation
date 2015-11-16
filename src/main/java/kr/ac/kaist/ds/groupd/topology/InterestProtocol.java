@@ -15,7 +15,7 @@ import peersim.core.Protocol;
 public class InterestProtocol implements Protocol, Linkable {
 
 	private List<Node> interestCommunity = new ArrayList<Node>();
-    private List<Node> interestCommunity = new ArrayList<Node>();
+    //private List<Node> interestCommunity = new ArrayList<Node>();
 
     private int candidateVotes = 0;
 
