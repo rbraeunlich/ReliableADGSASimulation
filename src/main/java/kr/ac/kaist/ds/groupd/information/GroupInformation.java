@@ -1,5 +1,5 @@
 
-package kr.ac.kaist.ds.groupd.imformation;
+package kr.ac.kaist.ds.groupd.information;
 
 //camel Case
 
@@ -10,14 +10,14 @@ import peersim.core.Node;
 
 class GroupInformation {
 
-    private Node nRepresentationNode;
+    private Node representationNode;
 
     private ArrayList<Node> alMemberNodes;
 
     private int nIndex;
 
     public GroupInformation(int index) {
-        nRepresentationNode = null;
+        representationNode = null;
         alMemberNodes = new ArrayList<Node>();
         nIndex = index;
     }
@@ -26,7 +26,7 @@ class GroupInformation {
         if (alMemberNodes.size() < 1)
             return;
 
-        nRepresentationNode = alMemberNodes.remove(new Random().nextInt(alMemberNodes.size()));
+        representationNode = alMemberNodes.remove(new Random().nextInt(alMemberNodes.size()));
 
     }
 
@@ -36,7 +36,7 @@ class GroupInformation {
 
     // setter, adder
     public void setnRepresentationNode(Node nRepresentationNode) {
-        this.nRepresentationNode = nRepresentationNode;
+        this.representationNode = nRepresentationNode;
     }
 
     public void setnNeighborNodes(ArrayList<Node> nNeighborNodes) {
@@ -49,7 +49,7 @@ class GroupInformation {
 
     // getter, minner
     public Node getnRepresentationNode() {
-        return nRepresentationNode;
+        return representationNode;
     }
 
     public ArrayList<Node> getnNeighborNodes() {
@@ -63,8 +63,8 @@ class GroupInformation {
             }
         }
 
-        if (nRepresentationNode.getID() == id) {
-            Node temp = nRepresentationNode;
+        if (representationNode.getID() == id) {
+            Node temp = representationNode;
             setRepresentationInGroupRandom();
             return temp;
         }

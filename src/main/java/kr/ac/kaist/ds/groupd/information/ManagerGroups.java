@@ -1,5 +1,5 @@
 
-package kr.ac.kaist.ds.groupd.imformation;
+package kr.ac.kaist.ds.groupd.information;
 
 import java.util.ArrayList;
 import java.util.Random;
