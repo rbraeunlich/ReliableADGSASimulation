@@ -7,12 +7,22 @@ import java.util.Random;
 import peersim.core.Node;
 
 public class ManagerGroups {
-    private static ArrayList<GroupInformation> alGroupInformations = new ArrayList<GroupInformation>();
 
-    private static ArrayList<Node> alDeleyQueue = new ArrayList<Node>();
+    private int nTotalNode;
 
-    public static void changeTheTotalNodeLocation(int totalNode) {
-        int nodeId = new Random().nextInt(totalNode);
+    private ArrayList<GroupInformation> alGroupInformations;
+
+    private ArrayList<Node> alDeleyQueue;
+
+    public ManagerGroups(int totalNode) {
+        alGroupInformations = new ArrayList<GroupInformation>();
+        alDeleyQueue = new ArrayList<Node>();
+
+        nTotalNode = totalNode;
+    }
+
+    public void changeTheTotalNodeLocation() {
+        int nodeId = new Random().nextInt(nTotalNode);
         Node temp = null;
 
         for (int i = 0; i < alGroupInformations.size(); i++) {
@@ -23,35 +33,37 @@ public class ManagerGroups {
         }
 
         if (temp == null)
-            for(int i = 0 ; i < alDeleyQueue.size(); i++)
+            for (int i = 0; i < alDeleyQueue.size(); i++)
                 if (alDeleyQueue.get(i).getID() == nodeId)
                     temp = alDeleyQueue.get(i);
-        
-        if( temp == null)
+
+        if (temp == null)
             return;
 
         if (1 == new Random().nextInt(2)) {
             alGroupInformations.get(new Random().nextInt(alGroupInformations.size()))
                     .addNeighborNode(temp);
-        }
-        else
-        {
+        } else {
             alDeleyQueue.add(temp);
         }
 
         // add the node's neighbor
     }
 
-    public static void addGroupInformation(GroupInformation Grif) {
-        ManagerGroups.alGroupInformations.add(Grif);
+    public void addGroupInformation(GroupInformation Grif) {
+        this.alGroupInformations.add(Grif);
     }
 
-    public static ArrayList<GroupInformation> getAlGroupInformations() {
+    public ArrayList<GroupInformation> getAlGroupInformations() {
         return alGroupInformations;
     }
 
-    public static void setAlGroupInformations(ArrayList<GroupInformation> alGroupInformations) {
-        ManagerGroups.alGroupInformations = alGroupInformations;
+    public void setAlGroupInformations(ArrayList<GroupInformation> alGroupInformations) {
+        this.alGroupInformations = alGroupInformations;
+    }
+
+    public int getDeleyQueueNumber() {
+        return alDeleyQueue.size();
     }
 
 }
