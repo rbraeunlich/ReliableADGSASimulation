@@ -48,8 +48,10 @@ public class InterestTopology extends WireGraph {
 
 	@Override
 	public void wire(Graph g) {
+		System.out.println("start the wire");
 		createLocalCommunities(g);
 		createGlobalCommunities(g);
+		System.out.println("start the revote");
 		resetVotes(g);
 	}
 
@@ -57,18 +59,20 @@ public class InterestTopology extends WireGraph {
 		//since I do not know how to combine two Linkable protocols
 		//I use this workaround which assumes, that all nodes can see each other
 		for (int i = 0; i < g.size(); i++) {
-			Node node = (Node) g.getNode(i);
+			Node node1 = (Node) g.getNode(i);
 			for (int j = i + 1; j < g.size(); j++) {
 				Node node2 = (Node) g.getNode(j);
-				double similarity = calculateSimilarity(node, node2);
+				double similarity = calculateSimilarity(node1, node2);
 				if (similarity > clusteringCoefficient) {
 					g.setEdge(i, j);
-					InterestProtocol nodeProtocol = (InterestProtocol) node
+					System.out.println("edge : "+g.getEdge(i, j).toString());
+					InterestProtocol nodeProtocol = (InterestProtocol) node1
 							.getProtocol(pid);
 					InterestProtocol node2Protocol = (InterestProtocol) node2
 							.getProtocol(pid);
 					nodeProtocol.addNeighbor(node2);
-					node2Protocol.addNeighbor(node);
+					node2Protocol.addNeighbor(node1);
+					
 				}
 			}
 		}
@@ -122,7 +126,7 @@ public class InterestTopology extends WireGraph {
 					.sorted((v, v2) -> v.getKey().compareTo(v2.getKey()))
 					.limit(numberCandidateVotes).map(c -> c.getValue())
 					.map(n -> (InterestProtocol) n.getProtocol(pid))
-					.forEach(p -> p.receiveCandidateVote());
+					.forEach((p) -> p.receiveCandidateVote());
 		}
 	}
 

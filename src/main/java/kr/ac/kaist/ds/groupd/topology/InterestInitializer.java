@@ -42,6 +42,9 @@ public class InterestInitializer implements Control {
 		Collection<Movie> movies = new MovieParser(moviesFile).parseMovies();
 		Collection<Rating> ratings = new RatingParser(movies, ratingsFile)
 				.parseRatings();
+		
+		System.out.println("finish collecting nodes");
+		
 		for (int i = 0; i < Network.size(); i++) {
 			int j = i;
 			List<Rating> filteredRatings = ratings.stream()
