@@ -12,18 +12,21 @@ class GroupInformation {
 
     private Node nRepresentationNode;
 
-    private ArrayList<Node> aLMemberNodes;
+    private ArrayList<Node> alMemberNodes;
 
-    public GroupInformation() {
+    private int nIndex;
+
+    public GroupInformation(int index) {
         nRepresentationNode = null;
-        aLMemberNodes = new ArrayList<Node>();
+        alMemberNodes = new ArrayList<Node>();
+        nIndex = index;
     }
 
     public void setRepresentationInGroupRandom() {
-        if (aLMemberNodes.size() < 1)
+        if (alMemberNodes.size() < 1)
             return;
 
-        nRepresentationNode = aLMemberNodes.remove(new Random().nextInt(aLMemberNodes.size()));
+        nRepresentationNode = alMemberNodes.remove(new Random().nextInt(alMemberNodes.size()));
 
     }
 
@@ -37,11 +40,11 @@ class GroupInformation {
     }
 
     public void setnNeighborNodes(ArrayList<Node> nNeighborNodes) {
-        this.aLMemberNodes = nNeighborNodes;
+        this.alMemberNodes = nNeighborNodes;
     }
 
     public void addNeighborNode(Node nNode) {
-        this.aLMemberNodes.add(nNode);
+        this.alMemberNodes.add(nNode);
     }
 
     // getter, minner
@@ -50,13 +53,13 @@ class GroupInformation {
     }
 
     public ArrayList<Node> getnNeighborNodes() {
-        return aLMemberNodes;
+        return alMemberNodes;
     }
 
     public Node getNode(int id) {
-        for (int i = 0; i < aLMemberNodes.size(); i++) {
-            if (aLMemberNodes.get(i).getID() == id) {
-                return aLMemberNodes.remove(i);
+        for (int i = 0; i < alMemberNodes.size(); i++) {
+            if (alMemberNodes.get(i).getID() == id) {
+                return alMemberNodes.remove(i);
             }
         }
 
@@ -67,5 +70,13 @@ class GroupInformation {
         }
 
         return null;
+    }
+
+    public String toString() {
+        return "Node_number :" + alMemberNodes;
+    }
+
+    public int getIndex() {
+        return nIndex;
     }
 }
