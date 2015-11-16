@@ -3,8 +3,11 @@ package kr.ac.kaist.ds.groupd.example.token;
 import java.util.ArrayList;
 
 import peersim.config.Configuration;
+import peersim.config.FastConfig;
 import peersim.core.Control;
+import peersim.core.Linkable;
 import peersim.core.Network;
+import peersim.core.Node;
 
 public class TokenObserver implements Control {
 
@@ -21,6 +24,7 @@ public class TokenObserver implements Control {
 		
 		System.out.println("");
 		for (int i = 0; i < Network.size(); i++) {
+			Node node = (Node)Network.get(i);
 			TokenProtocol protocol = (TokenProtocol) Network.get(i)
 					.getProtocol(pid);
 			if (protocol.hasToken()) {
@@ -30,6 +34,14 @@ public class TokenObserver implements Control {
 				protocol.resetToken();
 			}
 			protocol.clearQueue();
+			Linkable linkable = (Linkable) node.getProtocol(FastConfig
+		               .getLinkable(pid));
+		         System.out.print("Neighbors of "+node.getID()+"are[");
+		         for(int j=0; j<linkable.degree();j++)
+		         {
+		            System.out.print(linkable.getNeighbor(j).getID());
+		         }
+		         System.out.println("]\n");
 		}
 		
 		return false;
