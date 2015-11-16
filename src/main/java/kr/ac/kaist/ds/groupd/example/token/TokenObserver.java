@@ -28,6 +28,7 @@ public class TokenObserver implements Control {
 			TokenProtocol protocol = (TokenProtocol) Network.get(i)
 					.getProtocol(pid);
 			if (protocol.hasToken()) {
+				
 				System.out.println("Token at Node number "
 						+ Network.get(i).getID());
 				protocol.resetToken();

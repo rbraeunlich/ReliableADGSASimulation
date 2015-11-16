@@ -1,6 +1,7 @@
 package kr.ac.kaist.ds.groupd.example.token;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
@@ -35,12 +36,24 @@ public class TokenProtocol extends SingleValueHolder implements CDProtocol {
 	public void nextCycle(Node node, int pid) {
 		//boolean isOnlyOneTime = true;
 		//boolean isOnlyOneInput = true;
+		int a= 10;
+		
 		
 		if (token = true) {
 			Linkable linkable = (Linkable) node.getProtocol(FastConfig
 					.getLinkable(pid));
+		
+			System.out.println("\n\n--------");
+			System.out.print("Neighbors of "+node.getID()+"are[");
+	         for(int j=0; j<linkable.degree();j++)
+	         {
+	            System.out.print(linkable.getNeighbor(j).getID());
+	         }
+	        System.out.print("]\n"+linkable);
+			//System.out.println("\ntest : " + linkable.getNeighbor(0));
 			int degree = linkable.degree();
-			Node neighbor = linkable.getNeighbor(0);  
+			System.out.print(linkable.getNeighbor(0).getID());
+			Node neighbor = linkable.getNeighbor(new Random().nextInt(degree));  
 			TokenProtocol protocol = (TokenProtocol) neighbor.getProtocol(pid);
 			
 			protocol.setToken(true);
@@ -92,7 +105,7 @@ public class TokenProtocol extends SingleValueHolder implements CDProtocol {
 			*/
 			
 			System.out.println("");
-			System.out.println(" pre: "+node.getID()+" now: "+neighbor.getID());
+			System.out.println("pre: "+node.getID()+" now: "+neighbor.getID());
 			
 			System.out.print("output ID Set :");
 			for(int i = 0 ; i < alResultQueue.size() ; i ++)
