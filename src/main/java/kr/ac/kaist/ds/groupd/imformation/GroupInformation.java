@@ -1,7 +1,7 @@
 
 package kr.ac.kaist.ds.groupd.imformation;
 
-//Ä«¸á Ç¥±â¹ý
+//camel Case
 
 import java.util.ArrayList;
 import java.util.Random;
