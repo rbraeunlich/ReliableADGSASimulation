@@ -9,6 +9,7 @@ import java.util.Random;
 import peersim.core.Node;
 
 class GroupInformation {
+    //balblablabla
 
     private Node nRepresentationNode;
 
