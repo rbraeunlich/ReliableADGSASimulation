@@ -96,23 +96,9 @@ public class InterestTopology extends WireGraph {
 		SparseVector<Real> interest = nodeProtocol.getInterest();
 		SparseVector<Real> interest2 = node2Protocol.getInterest();
 		Real dotProduct = interest.times(interest2);
-		double magnitude = calculateMagnitude(interest);
-		double magnitude2 = calculateMagnitude(interest);
+		double magnitude = nodeProtocol.getMagnitude();
+		double magnitude2 = node2Protocol.getMagnitude();
 		return dotProduct.doubleValue() / (magnitude * magnitude2);
-	}
-
-	/**
-	 * Calculates the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
-	 * of a vector.
-	 * @param interest
-	 * @return
-	 */
-	private double calculateMagnitude(SparseVector<Real> interest) {
-		double sum = 0.0;
-		for(int i = 0; i < interest.getDimension(); i++){
-			sum += Math.pow(interest.get(i).doubleValue(), 2.0);
-		}
-		return Math.sqrt(sum);
 	}
 
 	/**
