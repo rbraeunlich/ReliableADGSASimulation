@@ -32,7 +32,7 @@ public class RatingParser {
 				long movieId = Long.parseLong(splitted[1]);
 				int rating = Integer.parseInt(splitted[2]);
 				long timestamp = Long.parseLong(splitted[3]);
-				Rating rat = new Rating(userId, movies.get(movieId), rating, new Date(timestamp));
+				Rating rat = new Rating(userId, movies.get(movieId), rating, timestamp);
 				ratings.add(rat);
 			}
 			return ratings;

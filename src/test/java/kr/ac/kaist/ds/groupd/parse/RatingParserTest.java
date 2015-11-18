@@ -1,13 +1,12 @@
 package kr.ac.kaist.ds.groupd.parse;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Date;
 
 import org.junit.Test;
 
@@ -27,15 +26,15 @@ public class RatingParserTest {
 			if (rating.getUserId() == 1L) {
 				assertThat(rating.getMovie().getId(), is(1L));
 				assertThat(rating.getRating(), is(5));
-				assertThat(rating.getTimestamp(), is(equalTo(new Date(978600760L))));
+				assertThat(rating.getTimestamp(), is(equalTo(978600760L)));
 			} else if (rating.getUserId() == 2L) {
 				assertThat(rating.getMovie().getId(), is(2L));
 				assertThat(rating.getRating(), is(3));
-				assertThat(rating.getTimestamp(), is(equalTo(new Date(978402109))));
+				assertThat(rating.getTimestamp(), is(equalTo(978402109L)));
 			} else if (rating.getUserId() == 3) {
 				assertThat(rating.getMovie().getId(), is(3L));
 				assertThat(rating.getRating(), is(3));
-				assertThat(rating.getTimestamp(), is(equalTo(new Date(978501968))));
+				assertThat(rating.getTimestamp(), is(equalTo(978501968L)));
 			} else {
 				fail();
 			}

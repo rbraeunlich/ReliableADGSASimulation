@@ -8,9 +8,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.SparseVector;
-
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
@@ -93,12 +90,23 @@ public class InterestTopology extends WireGraph {
 				.getProtocol(pid);
 		InterestProtocol node2Protocol = (InterestProtocol) node2
 				.getProtocol(pid);
-		SparseVector<Real> interest = nodeProtocol.getInterest();
-		SparseVector<Real> interest2 = node2Protocol.getInterest();
-		Real dotProduct = interest.times(interest2);
+		double[] interest = nodeProtocol.getInterest();
+		double[] interest2 = node2Protocol.getInterest();
+		double dotProduct = calculateDotProduct(interest, interest2);
 		double magnitude = nodeProtocol.getMagnitude();
 		double magnitude2 = node2Protocol.getMagnitude();
-		return dotProduct.doubleValue() / (magnitude * magnitude2);
+		return dotProduct / (magnitude * magnitude2);
+	}
+
+	private double calculateDotProduct(double[] interest, double[] interest2) {
+		if(interest.length != interest2.length){
+			throw new IllegalArgumentException("Vectors are of unequal length");
+		}
+		double sum = 0.0;
+		for(int i = 0; i < interest.length; i ++){
+			sum += interest[i] * interest2[i];
+		}
+		return sum;
 	}
 
 	/**

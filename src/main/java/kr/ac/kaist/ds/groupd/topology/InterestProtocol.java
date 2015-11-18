@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.SparseVector;
-
 import peersim.core.Linkable;
 import peersim.core.Node;
 import peersim.core.Protocol;
@@ -17,13 +14,13 @@ public class InterestProtocol implements Protocol, Linkable {
 	private int candidateVotes = 0;
 	private int representativeVotes;
 	private Node representative;
-	private SparseVector<Real> interestVector;
+	private double[] interestVector;
 	private double magnitude = 0.0;
 
 	public InterestProtocol(String prefix) {
 	}
 
-	public SparseVector<Real> getInterest() {
+	public double[] getInterest() {
 		return interestVector;
 	}
 
@@ -112,7 +109,7 @@ public class InterestProtocol implements Protocol, Linkable {
 	public void pack() {
 	}
 
-	public void setInterestVector(SparseVector<Real> interestVector) {
+	public void setInterestVector(double[] interestVector) {
 		this.interestVector = interestVector;
 		this.magnitude = calculateMagnitude(this.interestVector);
 	}
@@ -129,13 +126,13 @@ public class InterestProtocol implements Protocol, Linkable {
 	/**
 	 * Calculates the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
 	 * of a vector.
-	 * @param interest
+	 * @param vector
 	 * @return
 	 */
-	private double calculateMagnitude(SparseVector<Real> interest) {
+	private double calculateMagnitude(double[] vector) {
 		double sum = 0.0;
-		for(int i = 0; i < interest.getDimension(); i++){
-			sum += Math.pow(interest.get(i).doubleValue(), 2.0);
+		for(int i = 0; i < vector.length; i++){
+			sum += Math.pow(vector[i], 2.0);
 		}
 		return Math.sqrt(sum);
 	}

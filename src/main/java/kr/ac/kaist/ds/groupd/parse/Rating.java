@@ -1,7 +1,5 @@
 package kr.ac.kaist.ds.groupd.parse;
 
-import java.util.Date;
-
 public class Rating {
 
 	private final long userId;
@@ -10,9 +8,9 @@ public class Rating {
 
 	private final int rating;
 
-	private final Date timestamp;
+	private final long timestamp;
 
-	public Rating(long userId, Movie movie, int rating, Date timestamp) {
+	public Rating(long userId, Movie movie, int rating, long timestamp) {
 		super();
 		this.userId = userId;
 		this.movie = movie;
@@ -32,7 +30,7 @@ public class Rating {
 		return rating;
 	}
 
-	public Date getTimestamp() {
+	public long getTimestamp() {
 		return timestamp;
 	}
 
@@ -42,7 +40,7 @@ public class Rating {
 		int result = 1;
 		result = prime * result + ((movie == null) ? 0 : movie.hashCode());
 		result = prime * result + rating;
-		result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+		result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
 		result = prime * result + (int) (userId ^ (userId >>> 32));
 		return result;
 	}
@@ -63,14 +61,12 @@ public class Rating {
 			return false;
 		if (rating != other.rating)
 			return false;
-		if (timestamp == null) {
-			if (other.timestamp != null)
-				return false;
-		} else if (!timestamp.equals(other.timestamp))
+		if (timestamp != other.timestamp)
 			return false;
 		if (userId != other.userId)
 			return false;
 		return true;
 	}
+
 
 }
