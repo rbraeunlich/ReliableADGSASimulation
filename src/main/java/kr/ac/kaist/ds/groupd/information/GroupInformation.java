@@ -10,23 +10,23 @@ import peersim.core.Node;
 
 class GroupInformation {
 
-    private Node representationNode;
+    private Node nRepresentationNode;
 
-    private ArrayList<Node> alMemberNodes;
+    private ArrayList<Node> MemberNodes;
 
     private int nIndex;
-
+    
     public GroupInformation(int index) {
-        representationNode = null;
-        alMemberNodes = new ArrayList<Node>();
+        nRepresentationNode = null;
+        MemberNodes = new ArrayList<Node>();
         nIndex = index;
     }
 
     public void setRepresentationInGroupRandom() {
-        if (alMemberNodes.size() < 1)
+        if (MemberNodes.size() < 1)
             return;
 
-        representationNode = alMemberNodes.remove(new Random().nextInt(alMemberNodes.size()));
+        nRepresentationNode = MemberNodes.remove(new Random().nextInt(MemberNodes.size()));
 
     }
 
@@ -36,47 +36,39 @@ class GroupInformation {
 
     // setter, adder
     public void setnRepresentationNode(Node nRepresentationNode) {
-        this.representationNode = nRepresentationNode;
+        this.nRepresentationNode = nRepresentationNode;
     }
 
     public void setnNeighborNodes(ArrayList<Node> nNeighborNodes) {
-        this.alMemberNodes = nNeighborNodes;
+        this.MemberNodes = nNeighborNodes;
     }
 
     public void addNeighborNode(Node nNode) {
-        this.alMemberNodes.add(nNode);
+        this.MemberNodes.add(nNode);
     }
 
     // getter, minner
     public Node getnRepresentationNode() {
-        return representationNode;
+        return nRepresentationNode;
     }
 
     public ArrayList<Node> getnNeighborNodes() {
-        return alMemberNodes;
+        return MemberNodes;
     }
 
     public Node getNode(int id) {
-        for (int i = 0; i < alMemberNodes.size(); i++) {
-            if (alMemberNodes.get(i).getID() == id) {
-                return alMemberNodes.remove(i);
+        for (int i = 0; i < MemberNodes.size(); i++) {
+            if (MemberNodes.get(i).getID() == id) {
+                return MemberNodes.remove(i);
             }
         }
 
-        if (representationNode.getID() == id) {
-            Node temp = representationNode;
+        if (nRepresentationNode.getID() == id) {
+            Node temp = nRepresentationNode;
             setRepresentationInGroupRandom();
             return temp;
         }
 
         return null;
-    }
-
-    public String toString() {
-        return "Node_number :" + alMemberNodes;
-    }
-
-    public int getIndex() {
-        return nIndex;
     }
 }

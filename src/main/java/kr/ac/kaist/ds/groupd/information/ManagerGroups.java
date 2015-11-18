@@ -10,13 +10,13 @@ public class ManagerGroups {
 
     private int nTotalNode;
 
-    private ArrayList<GroupInformation> alGroupInformations;
+    private ArrayList<GroupInformation> GroupInformations;
 
-    private ArrayList<Node> alDeleyQueue;
+    private ArrayList<Node> DeleyQueue;
 
     public ManagerGroups(int totalNode) {
-        alGroupInformations = new ArrayList<GroupInformation>();
-        alDeleyQueue = new ArrayList<Node>();
+        GroupInformations = new ArrayList<GroupInformation>();
+        DeleyQueue = new ArrayList<Node>();
 
         nTotalNode = totalNode;
     }
@@ -28,26 +28,26 @@ public class ManagerGroups {
         // 향후 Balance mode, etc 참조.
         
         for (int j = 0; j < loopingNumber; j++) {
-            for (int i = 0; i < alGroupInformations.size(); i++) {
-                if (null != alGroupInformations.get(i).getNode(nodeId)) {
-                    temp = alGroupInformations.get(i).getNode(nodeId);
+            for (int i = 0; i < GroupInformations.size(); i++) {
+                if (null != GroupInformations.get(i).getNode(nodeId)) {
+                    temp = GroupInformations.get(i).getNode(nodeId);
                     break;
                 }
             }
 
             if (temp == null)
-                for (int i = 0; i < alDeleyQueue.size(); i++)
-                    if (alDeleyQueue.get(i).getID() == nodeId)
-                        temp = alDeleyQueue.get(i);
+                for (int i = 0; i < DeleyQueue.size(); i++)
+                    if (DeleyQueue.get(i).getID() == nodeId)
+                        temp = DeleyQueue.get(i);
 
             if (temp == null)
                 return;
 
             if (1 == new Random().nextInt(2)) {
-                alGroupInformations.get(new Random().nextInt(alGroupInformations.size()))
+                GroupInformations.get(new Random().nextInt(GroupInformations.size()))
                         .addNeighborNode(temp);
             } else {
-                alDeleyQueue.add(temp);
+                DeleyQueue.add(temp);
             }
         }
 
@@ -56,31 +56,31 @@ public class ManagerGroups {
 
     public void makeGroupInformation()
     {
-        addGroupInformation(new GroupInformation(alGroupInformations.size()));
+        addGroupInformation(new GroupInformation(GroupInformations.size()));
     }
     
     public void addGroupInformation(GroupInformation Grif) {
-        this.alGroupInformations.add(Grif);
+        this.GroupInformations.add(Grif);
     }
 
     public void setAlGroupInformations(ArrayList<GroupInformation> alGroupInformations) {
-        this.alGroupInformations = alGroupInformations;
+        this.GroupInformations = alGroupInformations;
     }
 
     public int getDeleyQueueNumber() {
-        return alDeleyQueue.size();
+        return DeleyQueue.size();
     }
 
     public int getTotalGroupInformation() {
-        return alGroupInformations.size();
+        return GroupInformations.size();
     }
 
     public GroupInformation getGroupInformation(int index) {
-        return alGroupInformations.get(index);
+        return GroupInformations.get(index);
     }
 
     public ArrayList<GroupInformation> getAlGroupInformations() {
-        return alGroupInformations;
+        return GroupInformations;
     }
 
 }
