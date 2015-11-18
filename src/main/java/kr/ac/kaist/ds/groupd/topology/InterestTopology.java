@@ -65,7 +65,10 @@ public class InterestTopology extends WireGraph {
 			for (int j = i + 1; j < g.size(); j++) {
 				Node node2 = (Node) g.getNode(j);
 				double similarity = calculateSimilarity(node, node2);
+				System.out.println("Similarity between " + node.getID() + " and " + node2.getID() + ": " + similarity);
 				if (similarity > clusteringCoefficient) {
+					System.out.println("Similarity high enough" );
+					System.out.println("");
 					g.setEdge(i, j);
 					InterestProtocol nodeProtocol = (InterestProtocol) node
 							.getProtocol(pid);
@@ -93,8 +96,8 @@ public class InterestTopology extends WireGraph {
 		SparseVector<Real> interest = nodeProtocol.getInterest();
 		SparseVector<Real> interest2 = node2Protocol.getInterest();
 		Real dotProduct = interest.times(interest2);
-		Double magnitude = calculateMagnitude(interest);
-		Double magnitude2 = calculateMagnitude(interest);
+		double magnitude = calculateMagnitude(interest);
+		double magnitude2 = calculateMagnitude(interest);
 		return dotProduct.doubleValue() / (magnitude * magnitude2);
 	}
 
@@ -104,8 +107,8 @@ public class InterestTopology extends WireGraph {
 	 * @param interest
 	 * @return
 	 */
-	private Double calculateMagnitude(SparseVector<Real> interest) {
-		Double sum = 0.0;
+	private double calculateMagnitude(SparseVector<Real> interest) {
+		double sum = 0.0;
 		for(int i = 0; i < interest.getDimension(); i++){
 			sum += Math.pow(interest.get(i).doubleValue(), 2.0);
 		}
