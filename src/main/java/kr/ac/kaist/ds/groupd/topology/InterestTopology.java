@@ -1,7 +1,6 @@
 
 package kr.ac.kaist.ds.groupd.topology;
 
-import java.security.spec.MGF1ParameterSpec;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -11,7 +10,6 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import kr.ac.kaist.ds.groupd.information.GroupInformation;
-
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
@@ -78,14 +76,14 @@ public class InterestTopology extends WireGraph {
         if(0== i)
             InterestInitializer.getManagerGroups().addNode(node1);
         else
-            if(false == InterestInitializer.getManagerGroups().existnodeInManagerGroups(
+            if(false == InterestInitializer.getManagerGroups().existNodeInManagerGroups(
                             node1))
             {
                 GroupInformation temp = new GroupInformation(InterestInitializer.getManagerGroups().getAllGroupInformations().size()+1);
                 InterestInitializer.getManagerGroups().addGroupInformation(temp);
                 InterestInitializer.getManagerGroups().setNowGroupIndex(temp);
             }
-            else if(true == InterestInitializer.getManagerGroups().existnodeInManagerGroups(
+            else if(true == InterestInitializer.getManagerGroups().existNodeInManagerGroups(
                     node1))
                 continue;
         

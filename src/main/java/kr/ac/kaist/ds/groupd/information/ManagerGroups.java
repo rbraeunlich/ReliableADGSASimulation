@@ -4,59 +4,69 @@ package kr.ac.kaist.ds.groupd.information;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
 import peersim.core.Node;
 
+/**
+ * ManagerGroups class manage the GroupInformation.
+ */
 public class ManagerGroups {
 
+    // delete this code when some test~.
     public static int _BLANCE_MODE = 0x0000000000000001;
 
-    private int nMode;
+    private int mode;
 
-    private int nTotalNode;
+    private int totalNode;
 
     private ArrayList<GroupInformation> groupInformations;
 
-    private int nSetNowGroupIndex;
+    private int setNowGroupIndex;
 
-    private ArrayList<Node> DeleyQueue;
+    private ArrayList<Node> deleyQueue;
 
     public ManagerGroups(int totalNode, int mode) {
         groupInformations = new ArrayList<GroupInformation>();
-        DeleyQueue = new ArrayList<Node>();
-        // if you initialize the nSetNowGroupIndexNumber. the program cannot
+        deleyQueue = new ArrayList<Node>();
+        // if you initialize the setNowGroupIndexNumber. the program cannot
         // operate;
-        
-        GroupInformation temp = new GroupInformation(groupInformations.size()+1);
-        
+
+        GroupInformation temp = new GroupInformation(groupInformations.size() + 1);
+
         groupInformations.add(temp);
-        
-        nSetNowGroupIndex = groupInformations.indexOf(temp);
-        nMode = mode;
-        nTotalNode = totalNode;
-        
-        System.out.println("Total Node : " + getnTotalNode() + " and SuccessFully Operate MG");
+
+        setNowGroupIndex = groupInformations.indexOf(temp);
+        this.mode = mode;
+        this.totalNode = totalNode;
+
+        System.out.println("Total Node : " + gettotalNode() + " and SuccessFully Operate MG");
     }
 
+    /**
+     * this function offers change all nodes position. if you set loopingNumber.
+     * the function will be operating base on loopngNumber. Now the choice
+     * algorithm based on random. so we will be modifyed this code.
+     * 
+     * @param loopingNumber
+     */
     public void changeTheTotalNodeLocation(int loopingNumber) {
-        int nodeId = new Random().nextInt(nTotalNode);
+        int nodeId = new Random().nextInt(totalNode);
         Node temp = null;
 
         // 향후 Balance mode, etc 참조.
 
         for (int j = 0; j < loopingNumber; j++) {
             for (int i = 0; i < groupInformations.size(); i++) {
-                if (null != groupInformations.get(i).getNode(nodeId)) {
-                    temp = groupInformations.get(i).getNode(nodeId);
+                if (null != groupInformations.get(i).extractNode(nodeId)) {
+                    temp = groupInformations.get(i).extractNode(nodeId);
                     break;
                 }
             }
 
             if (temp == null)
-                for (int i = 0; i < DeleyQueue.size(); i++)
-                    if (DeleyQueue.get(i).getID() == nodeId)
-                        temp = DeleyQueue.get(i);
+                for (int i = 0; i < deleyQueue.size(); i++)
+                    if (deleyQueue.get(i).getID() == nodeId) {
+                        temp = deleyQueue.get(i);
+                    }
 
             if (temp == null)
                 return;
@@ -65,7 +75,7 @@ public class ManagerGroups {
                 groupInformations.get(new Random().nextInt(groupInformations.size()))
                         .addNeighborNode(temp);
             } else {
-                DeleyQueue.add(temp);
+                deleyQueue.add(temp);
             }
         }
 
@@ -85,35 +95,39 @@ public class ManagerGroups {
     }
 
     public void addNode(Node node) {
-        this.groupInformations.get(nSetNowGroupIndex).addNeighborNode(node);
+        this.groupInformations.get(setNowGroupIndex).addNeighborNode(node);
     }
 
     // Set
 
     public void setNowGroupIndex(GroupInformation groupInformation) {
-        this.nSetNowGroupIndex = groupInformations.indexOf(groupInformation);
+        this.setNowGroupIndex = groupInformations.indexOf(groupInformation);
     }
 
     public void setAlGroupInformations(ArrayList<GroupInformation> groupInformations) {
         this.groupInformations = groupInformations;
     }
 
-    public void setnMode(int nMode) {
-        this.nMode = nMode;
+    public void setmode(int mode) {
+        this.mode = mode;
     }
 
-    public void setnTotalNode(int nTotalNode) {
-        this.nTotalNode = nTotalNode;
+    public void settotalNode(int totalNode) {
+        this.totalNode = totalNode;
     }
 
-    // Find
-
-    public boolean existnodeInManagerGroups(Node node) {
+    /**
+     * the existNodeInManagerGroups offers check the node exist in all Node's Groups. so if the node exist any Groups. you get
+     * 'true' but their not exist in the group. you will get 'false'
+     * 
+     * @param node
+     * @return
+     */
+    public boolean existNodeInManagerGroups(Node node) {
         for (int i = 0; i < groupInformations.size(); i++) {
 
-            if (-1 != groupInformations.get(i).getNeighborNodes().indexOf(node))
-            {
-            //    System.out.println("exist in ("+i+")"+"groupInformations");
+            if (false != groupInformations.get(i).getNeighborNodes().contains(node)) {
+                // System.out.println("exist in ("+i+")"+"groupInformations");
                 return true;
             }
         }
@@ -121,14 +135,13 @@ public class ManagerGroups {
     }
 
     // Get
-    
-    public int getNowGroupIndex()
-    {
-        return nSetNowGroupIndex;
+
+    public int getNowGroupIndex() {
+        return setNowGroupIndex;
     }
 
-    public int getDeleyQueueNumber() {
-        return DeleyQueue.size();
+    public int getdeleyQueueNumber() {
+        return deleyQueue.size();
     }
 
     public int getTotalGroupInformation() {
@@ -143,12 +156,12 @@ public class ManagerGroups {
         return groupInformations;
     }
 
-    public int getnMode() {
-        return nMode;
+    public int getmode() {
+        return mode;
     }
 
-    public int getnTotalNode() {
-        return nTotalNode;
+    public int gettotalNode() {
+        return totalNode;
     }
 
 }

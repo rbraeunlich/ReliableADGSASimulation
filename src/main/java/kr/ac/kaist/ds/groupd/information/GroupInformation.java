@@ -1,8 +1,9 @@
 
 package kr.ac.kaist.ds.groupd.information;
 
-//camel Case
-
+/**
+ * GroupInformation class manage the interested node's set. so the GroupInformation
+ */
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,23 +11,26 @@ import peersim.core.Node;
 
 public class GroupInformation {
 
-    private Node nRepresentationNode;
+    private Node representationNode;
 
     private ArrayList<Node> memberNodes;
 
-    private int nIndex;
+    private int Index;
     
     public GroupInformation(int index) {
-        nRepresentationNode = null;
+        representationNode = null;
         memberNodes = new ArrayList<Node>();
-        nIndex = index;
+        Index = index;
     }
 
+    /**
+     * Set the Representation but it is setting using random. we will change this code.
+     */
     public void setRepresentationInGroupRandom() {
         if (memberNodes.size() < 1)
             return;
 
-        nRepresentationNode = memberNodes.remove(new Random().nextInt(memberNodes.size()));
+        representationNode = memberNodes.remove(new Random().nextInt(memberNodes.size()));
 
     }
 
@@ -35,11 +39,11 @@ public class GroupInformation {
     }
 
     // setter, adder
-    public void setnRepresentationNode(Node nRepresentationNode) {
-        this.nRepresentationNode = nRepresentationNode;
+    public void setRepresentationNode(Node nrepresentationNode) {
+        this.representationNode = nrepresentationNode;
     }
 
-    public void setnNeighborNodes(ArrayList<Node> nNeighborNodes) {
+    public void setNeighborNodes(ArrayList<Node> nNeighborNodes) {
         this.memberNodes = nNeighborNodes;
     }
 
@@ -47,37 +51,43 @@ public class GroupInformation {
         this.memberNodes.add(nNode);
     }
 
+    public void setIndex(int nIndex) {
+        this.Index = nIndex;
+    }
+    
     // getter, minner
-    public Node getnRepresentationNode() {
-        return nRepresentationNode;
+    public int getIndex() {
+        return Index;
+    }
+    
+    public Node getRepresentationNode() {
+        return representationNode;
     }
 
     public ArrayList<Node> getNeighborNodes() {
         return memberNodes;
     }
 
-    public Node getNode(int id) {
+    /**
+     * extractNode erect one node based on id in the group.
+     * 
+     * @param id
+     * @return
+     */
+    public Node extractNode(int id) {
         for (int i = 0; i < memberNodes.size(); i++) {
             if (memberNodes.get(i).getID() == id) {
                 return memberNodes.remove(i);
             }
         }
 
-        if (nRepresentationNode.getID() == id) {
-            Node temp = nRepresentationNode;
+        if (representationNode.getID() == id) {
+            Node temp = representationNode;
             setRepresentationInGroupRandom();
             return temp;
         }
 
         return null;
-    }
-
-    public int getnIndex() {
-        return nIndex;
-    }
-
-    public void setnIndex(int nIndex) {
-        this.nIndex = nIndex;
     }
     
     
