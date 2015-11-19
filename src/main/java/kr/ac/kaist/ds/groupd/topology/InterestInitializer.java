@@ -40,9 +40,6 @@ public class InterestInitializer implements Control {
     @Override
     public boolean execute() {
         System.out.println("Start");
-        MG.makeGroupInformation();
-
-        System.out.println("Total Node : " + MG.getnTotalNode() + " and SuccessFully Operate MG");
 
         URL ratingsFile = this.getClass().getClassLoader()
                 .getResource("kr/ac/kaist/ds/groupd/topology/ratings.dat");
@@ -51,7 +48,7 @@ public class InterestInitializer implements Control {
         Collection<Movie> movies = new MovieParser(moviesFile).parseMovies();
         Collection<Rating> ratings = new RatingParser(movies, ratingsFile).parseRatings();
 
-        System.out.println("finish initating each node's states");
+        System.out.println("finish initializing each node's states");
 
         for (int i = 0; i < Network.size(); i++) {
             int j = i;

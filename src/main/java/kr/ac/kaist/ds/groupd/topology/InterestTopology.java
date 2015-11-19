@@ -1,3 +1,4 @@
+
 package kr.ac.kaist.ds.groupd.topology;
 
 import java.security.spec.MGF1ParameterSpec;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import kr.ac.kaist.ds.groupd.information.GroupInformation;
 
 import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.SparseVector;
@@ -28,8 +31,6 @@ public class InterestTopology extends WireGraph {
     private static final String PAR_REP_THRESHOLD = "repThreshold";
 
     private final double clusteringCoefficient;
-    
-    
 
     /**
      * {@link InterestProtocol} pid
@@ -54,11 +55,11 @@ public class InterestTopology extends WireGraph {
 
     @Override
     public void wire(Graph g) {
-        System.out.println("start the wire");
+        System.out.println("start the Create Local Communities");
         createLocalCommunities(g);
-       // createGlobalCommunities(g);
+        // createGlobalCommunities(g);
         System.out.println("start the revote");
-        
+
         resetVotes(g);
     }
 
@@ -66,29 +67,59 @@ public class InterestTopology extends WireGraph {
         // since I do not know how to combine two Linkable protocols
         // I use this workaround which assumes, that all nodes can see each
         // other
-        
+
         // add my source code here
-        
+
         for (int i = 0; i < g.size(); i++) {
             Node node1 = (Node)g.getNode(i);
-            System.out.println("test");
-            System.out.println("test :" +InterestInitializer.getManagerGroups().existnodeInManagerGroups(node1));
-           
-            System.exit(0);
+         //   System.out.println("test :"
+           //         + InterestInitializer.getManagerGroups().existnodeInManagerGroups(node1));
+        if(0== i)
+            InterestInitializer.getManagerGroups().addNode(node1);
+        else
+            if(false == InterestInitializer.getManagerGroups().existnodeInManagerGroups(
+                            node1))
+            {
+                GroupInformation temp = new GroupInformation(InterestInitializer.getManagerGroups().getAllGroupInformations().size()+1);
+                InterestInitializer.getManagerGroups().addGroupInformation(temp);
+                InterestInitializer.getManagerGroups().setNowGroupIndex(temp);
+            }
+            else if(true == InterestInitializer.getManagerGroups().existnodeInManagerGroups(
+                    node1))
+                continue;
+        
+            //  System.out.println("test :"
+         //           + InterestInitializer.getManagerGroups().existnodeInManagerGroups(node1)+"\nsize:"+g.size());
+
+        System.out.println("chenck group size :" +InterestInitializer.getManagerGroups().getNowGroupIndex());
+        
             for (int j = i + 1; j < g.size(); j++) {
                 Node node2 = (Node)g.getNode(j);
                 double similarity = calculateSimilarity(node1, node2);
                 if (similarity > clusteringCoefficient) {
                     g.setEdge(i, j);
-                    System.out.println("edge : " + g.getEdge(i, j).toString());
                     InterestProtocol nodeProtocol = (InterestProtocol)node1.getProtocol(pid);
                     InterestProtocol node2Protocol = (InterestProtocol)node2.getProtocol(pid);
                     nodeProtocol.addNeighbor(node2);
                     node2Protocol.addNeighbor(node1);
 
+                  //  if (false == InterestInitializer.getManagerGroups().existnodeInManagerGroups(
+                    //        node2))
+                        InterestInitializer.getManagerGroups().addNode(node2);
+
                 }
             }
+
+            System.out.println("the ManagementGroup("
+                    + InterestInitializer.getManagerGroups().getNowGroupIndex()
+                    + ")'s Node is "
+                    + InterestInitializer
+                            .getManagerGroups()
+                            .getGroupInformation(
+                                    InterestInitializer.getManagerGroups().getNowGroupIndex())
+                            .getNeighborNodes().size());
         }
+      System.exit(0);
     }
 
     private double calculateSimilarity(Node node, Node node2) {

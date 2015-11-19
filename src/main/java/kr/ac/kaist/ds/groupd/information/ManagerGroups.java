@@ -4,6 +4,8 @@ package kr.ac.kaist.ds.groupd.information;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 import peersim.core.Node;
 
 public class ManagerGroups {
@@ -25,9 +27,16 @@ public class ManagerGroups {
         DeleyQueue = new ArrayList<Node>();
         // if you initialize the nSetNowGroupIndexNumber. the program cannot
         // operate;
-        nSetNowGroupIndex = -1;
+        
+        GroupInformation temp = new GroupInformation(groupInformations.size()+1);
+        
+        groupInformations.add(temp);
+        
+        nSetNowGroupIndex = groupInformations.indexOf(temp);
         nMode = mode;
         nTotalNode = totalNode;
+        
+        System.out.println("Total Node : " + getnTotalNode() + " and SuccessFully Operate MG");
     }
 
     public void changeTheTotalNodeLocation(int loopingNumber) {
@@ -103,12 +112,20 @@ public class ManagerGroups {
         for (int i = 0; i < groupInformations.size(); i++) {
 
             if (-1 != groupInformations.get(i).getNeighborNodes().indexOf(node))
+            {
+            //    System.out.println("exist in ("+i+")"+"groupInformations");
                 return true;
+            }
         }
         return false;
     }
 
     // Get
+    
+    public int getNowGroupIndex()
+    {
+        return nSetNowGroupIndex;
+    }
 
     public int getDeleyQueueNumber() {
         return DeleyQueue.size();
@@ -122,7 +139,7 @@ public class ManagerGroups {
         return groupInformations.get(index);
     }
 
-    public ArrayList<GroupInformation> getAlGroupInformations() {
+    public ArrayList<GroupInformation> getAllGroupInformations() {
         return groupInformations;
     }
 
