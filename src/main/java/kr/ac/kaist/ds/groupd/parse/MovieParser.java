@@ -1,10 +1,13 @@
 package kr.ac.kaist.ds.groupd.parse;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Scanner;
 
 public class MovieParser {
 
@@ -16,11 +19,13 @@ public class MovieParser {
 
 	public Collection<Movie> parseMovies() {
 		Collection<Movie> movies = new ArrayList<>();
-		try (Scanner sc = new Scanner(fileUrl.openStream());) {
-			while (sc.hasNextLine()) {
-				String line = sc.nextLine();
+		try (BufferedReader br = new BufferedReader(new FileReader(new File(
+				fileUrl.toURI())));) {
+			String line = null;
+			while ((line = br.readLine()) != null) {
 				String[] splitted = line.split("::");
-				String genres = splitted[2].replaceAll("'", "").replaceAll("-", "");
+				String genres = splitted[2].replaceAll("'", "").replaceAll("-",
+						"");
 				Collection<Genre> collGenres = new ArrayList<>();
 				for (String genre : genres.split("\\|")) {
 					collGenres.add(Genre.valueOf(genre));
@@ -31,7 +36,7 @@ public class MovieParser {
 				movies.add(mov);
 			}
 			return movies;
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 	}

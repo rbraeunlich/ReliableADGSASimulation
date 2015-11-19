@@ -62,10 +62,7 @@ public class InterestTopology extends WireGraph {
 			for (int j = i + 1; j < g.size(); j++) {
 				Node node2 = (Node) g.getNode(j);
 				double similarity = calculateSimilarity(node, node2);
-				System.out.println("Similarity between " + node.getID() + " and " + node2.getID() + ": " + similarity);
 				if (similarity > clusteringCoefficient) {
-					System.out.println("Similarity high enough" );
-					System.out.println("");
 					g.setEdge(i, j);
 					InterestProtocol nodeProtocol = (InterestProtocol) node
 							.getProtocol(pid);
