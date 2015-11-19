@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 
 import kr.ac.kaist.ds.groupd.information.GroupInformation;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.SparseVector;
-
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
@@ -63,6 +60,10 @@ public class InterestTopology extends WireGraph {
         resetVotes(g);
     }
 
+	/**
+	 * Creates the local community by creating edges between nodes whose similarity is
+	 * greater than the {@link #clusteringCoefficient}.
+	 */
     private void createLocalCommunities(Graph g) {
         // since I do not know how to combine two Linkable protocols
         // I use this workaround which assumes, that all nodes can see each
@@ -122,25 +123,38 @@ public class InterestTopology extends WireGraph {
       System.exit(0);
     }
 
+	/**
+	 * Calculates the similarity based on the cosine similarity. 
+	 * See <a href="https://en.wikipedia.org/wiki/Cosine_similarity">Wikipedia<a/>
+	 * @param node
+	 * @param node2
+	 * @return
+	 */
     private double calculateSimilarity(Node node, Node node2) {
         InterestProtocol nodeProtocol = (InterestProtocol)node.getProtocol(pid);
         InterestProtocol node2Protocol = (InterestProtocol)node2.getProtocol(pid);
-        SparseVector<Real> interest = nodeProtocol.getInterest();
-        SparseVector<Real> interest2 = node2Protocol.getInterest();
-        Real dotProduct = interest.times(interest2);
-        Double magnitude = calculateMagnitude(interest);
-        Double magnitude2 = calculateMagnitude(interest);
-        return dotProduct.doubleValue() / (magnitude * magnitude2);
+		double[] interest = nodeProtocol.getInterest();
+		double[] interest2 = node2Protocol.getInterest();
+		double dotProduct = calculateDotProduct(interest, interest2);
+		double magnitude = nodeProtocol.getMagnitude();
+		double magnitude2 = node2Protocol.getMagnitude();
+		return dotProduct / (magnitude * magnitude2);
     }
 
-    private Double calculateMagnitude(SparseVector<Real> interest) {
-        Double sum = 0.0;
-        for (int i = 0; i < interest.getDimension(); i++) {
-            sum += Math.pow(interest.get(i).doubleValue(), 2.0);
+	private double calculateDotProduct(double[] interest, double[] interest2) {
+		if(interest.length != interest2.length){
+			throw new IllegalArgumentException("Vectors are of unequal length");
+		}
+		double sum = 0.0;
+		for(int i = 0; i < interest.length; i ++){
+			sum += interest[i] * interest2[i];
         }
-        return Math.sqrt(sum);
+		return sum;
     }
 
+	/**
+	 * Creates the global community by initiating the voting mechanism for candidates and representatives.
+	 */
     private void createGlobalCommunities(Graph g) {
         candidateSelectionAndVote(g);
         potentialRepresentativeIndentification(g);
@@ -226,6 +240,10 @@ public class InterestTopology extends WireGraph {
         }
     }
 
+	/**
+	 * Wraps a graph with an {@link Iterable} to be able to use it inside a for-each loop.
+	 *
+	 */
     private static class GraphIteratorWrapper implements Iterable<Node> {
 
         private Graph g;

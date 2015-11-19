@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.jscience.mathematics.number.Real;
-import org.jscience.mathematics.vector.SparseVector;
-
 import peersim.core.Linkable;
 import peersim.core.Node;
 import peersim.core.Protocol;
@@ -23,12 +20,14 @@ public class InterestProtocol implements Protocol, Linkable {
 
     private Node representative;
 
-    private SparseVector<Real> interestVector;
+	private double[] interestVector;
+	private double magnitude = 0.0;
+
 
     public InterestProtocol(String prefix) {
     }
 
-    public SparseVector<Real> getInterest() {
+	public double[] getInterest() {
         return interestVector;
     }
 
@@ -46,6 +45,9 @@ public class InterestProtocol implements Protocol, Linkable {
         return interestCommunity;
     }
 
+	/**
+	 * Increases the candidate votes by one.
+	 */
     public void receiveCandidateVote() {
         candidateVotes++;
     }
@@ -54,6 +56,9 @@ public class InterestProtocol implements Protocol, Linkable {
         return candidateVotes;
     }
 
+	/**
+	 * Increases the representative votes by one.
+	 */
     public void receiveRepresentativeVote() {
         representativeVotes++;
     }
@@ -66,6 +71,10 @@ public class InterestProtocol implements Protocol, Linkable {
         this.representative = node;
     }
 
+	/**
+	 * Sets candidate and representative votings to zero.
+	 * Has to be called after an election finishes.
+	 */
     public void resetVotes() {
         candidateVotes = 0;
         representativeVotes = 0;
@@ -107,7 +116,31 @@ public class InterestProtocol implements Protocol, Linkable {
     public void pack() {
     }
 
-    public void setInterestVector(SparseVector<Real> interestVector) {
+	public void setInterestVector(double[] interestVector) {
         this.interestVector = interestVector;
+		this.magnitude = calculateMagnitude(this.interestVector);
     }
+	
+	/**
+	 * Returns the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
+	 * of the vector that is returned by {@link #getInterest()}. The magnitude is precomputed because it is needed quite often.
+	 * @return
+	 */
+	public double getMagnitude(){
+		return magnitude;
+	}
+	
+	/**
+	 * Calculates the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
+	 * of a vector.
+	 * @param vector
+	 * @return
+	 */
+	private double calculateMagnitude(double[] vector) {
+		double sum = 0.0;
+		for(int i = 0; i < vector.length; i++){
+			sum += Math.pow(vector[i], 2.0);
+		}
+		return Math.sqrt(sum);
+	}
 }
