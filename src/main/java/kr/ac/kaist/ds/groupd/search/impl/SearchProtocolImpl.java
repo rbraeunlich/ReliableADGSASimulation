@@ -85,6 +85,7 @@ public class SearchProtocolImpl implements SearchProtocol {
     
     private long Degree(ArrayList<Node> S)
     {
+        // i Dont know how to realization this part
         return -1;
     }
 
