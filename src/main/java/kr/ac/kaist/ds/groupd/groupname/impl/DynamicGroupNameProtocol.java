@@ -26,7 +26,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
 
     private long nodeId;
 
-    private GroupName<String> groupname;
+    private GroupName<String> groupName;
 
     public DynamicGroupNameProtocol(String prefix) {
         this.interestProtocolPid = Configuration.getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
@@ -42,7 +42,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
     @Override
     public double compareWithGroupName(GroupName<String> otherName) {
         String other = otherName.getName();
-        String thisName = this.groupname.getName();
+        String thisName = this.groupName.getName();
         int difference = other.length() - thisName.length();
         // the other one is shorter
         if (difference < 0) {
@@ -77,7 +77,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
 
     @Override
     public GroupName<String> getGroupName() {
-        return groupname;
+        return groupName;
     }
 
     @Override
@@ -100,8 +100,8 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
                     }
 
                 }).reduce("", (s1, s2) -> s1 + s2);
-        groupname = new DynamicGroupName(groupId);
-        return groupname;
+        groupName = new DynamicGroupName(groupId);
+        return groupName;
     }
 
     @Override
