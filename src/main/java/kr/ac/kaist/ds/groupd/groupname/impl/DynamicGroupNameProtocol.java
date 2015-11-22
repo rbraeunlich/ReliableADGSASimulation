@@ -9,7 +9,6 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<Byte> {
 
 	private static final String PAR_BITS_USED = "bits";
 	private static final String PAR_SIMILARITY_THRESHOLD = "similarity";
-	private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 	private int interestProtocolPid;
 	private double similarityThreshold;
 	private int bitsUsed;

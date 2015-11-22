@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
@@ -22,7 +23,7 @@ public class InterestTopology extends WireGraph {
 
 	private final double clusteringCoefficient;
 	/**
-	 * {@link InterestProtocol} pid
+	 * {@link InterestProtocolImpl} pid
 	 */
 	private final int pid;
 	private final int numberCandidateVotes;
@@ -64,9 +65,9 @@ public class InterestTopology extends WireGraph {
 				double similarity = calculateSimilarity(node, node2);
 				if (similarity > clusteringCoefficient) {
 					g.setEdge(i, j);
-					InterestProtocol nodeProtocol = (InterestProtocol) node
+					InterestProtocolImpl nodeProtocol = (InterestProtocolImpl) node
 							.getProtocol(pid);
-					InterestProtocol node2Protocol = (InterestProtocol) node2
+					InterestProtocolImpl node2Protocol = (InterestProtocolImpl) node2
 							.getProtocol(pid);
 					nodeProtocol.addNeighbor(node2);
 					node2Protocol.addNeighbor(node);
@@ -83,9 +84,9 @@ public class InterestTopology extends WireGraph {
 	 * @return
 	 */
 	private double calculateSimilarity(Node node, Node node2) {
-		InterestProtocol nodeProtocol = (InterestProtocol) node
+		InterestProtocolImpl nodeProtocol = (InterestProtocolImpl) node
 				.getProtocol(pid);
-		InterestProtocol node2Protocol = (InterestProtocol) node2
+		InterestProtocolImpl node2Protocol = (InterestProtocolImpl) node2
 				.getProtocol(pid);
 		double[] interest = nodeProtocol.getInterest();
 		double[] interest2 = node2Protocol.getInterest();
@@ -121,7 +122,7 @@ public class InterestTopology extends WireGraph {
 	 */
 	private void candidateSelectionAndVote(Graph g) {
 		for (Node node : new GraphIteratorWrapper(g)) {
-			InterestProtocol protocol = (InterestProtocol) node
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
 					.getProtocol(pid);
 			Collection<Node> neighbours = protocol.getInterestCommunity();
 			// FIXME I assume that no two neighbors have the same similarity
@@ -135,7 +136,7 @@ public class InterestTopology extends WireGraph {
 			listVotings.stream()
 					.sorted((v, v2) -> v.getKey().compareTo(v2.getKey()))
 					.limit(numberCandidateVotes).map(c -> c.getValue())
-					.map(n -> (InterestProtocol) n.getProtocol(pid))
+					.map(n -> (InterestProtocolImpl) n.getProtocol(pid))
 					.forEach(p -> p.receiveCandidateVote());
 		}
 	}
@@ -146,14 +147,14 @@ public class InterestTopology extends WireGraph {
 	 */
 	private void potentialRepresentativeIndentification(Graph g) {
 		for (Node node : new GraphIteratorWrapper(g)) {
-			InterestProtocol protocol = (InterestProtocol) node
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
 					.getProtocol(pid);
 			Collection<Node> neighbours = protocol.getInterestCommunity();
 			Collection<Node> candidates = new ArrayList<Node>(neighbours);
 			candidates.add(node);
 			List<Node> representativeCandidates = candidates
 					.stream()
-					.filter(n -> ((InterestProtocol) n.getProtocol(pid))
+					.filter(n -> ((InterestProtocolImpl) n.getProtocol(pid))
 							.getCandidateVotes() > representativeThreshold)
 					.collect(Collectors.toList());
 			double minDistance = Double.MAX_VALUE;
@@ -165,7 +166,7 @@ public class InterestTopology extends WireGraph {
 					representative = node2;
 				}
 			}
-			((InterestProtocol) representative.getProtocol(pid))
+			((InterestProtocolImpl) representative.getProtocol(pid))
 					.receiveRepresentativeVote();
 		}
 	}
@@ -179,18 +180,18 @@ public class InterestTopology extends WireGraph {
 		// based on gossip overlays (2013)
 		// for that
 		for (Node node : new GraphIteratorWrapper(g)) {
-			InterestProtocol protocol = (InterestProtocol) node
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
 					.getProtocol(pid);
 			List<Node> neighbours = new ArrayList<Node>(
 					protocol.getInterestCommunity());
 			neighbours.add(node);
 			List<Node> representative = neighbours
 					.stream()
-					.filter(n -> ((InterestProtocol) n.getProtocol(pid))
+					.filter(n -> ((InterestProtocolImpl) n.getProtocol(pid))
 							.getRepresentativeVotes() > 0)
-					.sorted((n, n2) -> ((InterestProtocol) n.getProtocol(pid))
+					.sorted((n, n2) -> ((InterestProtocolImpl) n.getProtocol(pid))
 							.getRepresentativeVotes().compareTo(
-									((InterestProtocol) n2.getProtocol(pid))
+									((InterestProtocolImpl) n2.getProtocol(pid))
 											.getRepresentativeVotes()))
 					.limit(1).collect(Collectors.toList());
 			protocol.setRepresentative(representative.get(0));
@@ -200,7 +201,7 @@ public class InterestTopology extends WireGraph {
 	private void resetVotes(Graph g) {
 		for (int i = 0; i < g.size(); i++) {
 			Node node = (Node) g.getNode(i);
-			InterestProtocol protocol = (InterestProtocol) node
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
 					.getProtocol(pid);
 			protocol.resetVotes();
 		}

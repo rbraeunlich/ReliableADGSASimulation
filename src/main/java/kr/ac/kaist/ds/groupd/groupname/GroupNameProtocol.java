@@ -12,6 +12,7 @@ import peersim.cdsim.CDProtocol;
  */
 public interface GroupNameProtocol<T> extends CDProtocol {
 
+	static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 	/**
 	 * Compares this group name with another one and returns the percentage of similarity.
 	 * @param otherName

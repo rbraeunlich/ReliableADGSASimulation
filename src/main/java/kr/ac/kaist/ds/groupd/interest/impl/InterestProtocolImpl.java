@@ -1,4 +1,4 @@
-package kr.ac.kaist.ds.groupd.topology;
+package kr.ac.kaist.ds.groupd.interest.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,7 +8,7 @@ import peersim.core.Linkable;
 import peersim.core.Node;
 import peersim.core.Protocol;
 
-public class InterestProtocol implements Protocol, Linkable {
+public class InterestProtocolImpl implements Protocol, Linkable {
 
 	private List<Node> interestCommunity = new ArrayList<Node>();
 	private int candidateVotes = 0;
@@ -17,7 +17,7 @@ public class InterestProtocol implements Protocol, Linkable {
 	private double[] interestVector;
 	private double magnitude = 0.0;
 
-	public InterestProtocol(String prefix) {
+	public InterestProtocolImpl(String prefix) {
 	}
 
 	public double[] getInterest() {

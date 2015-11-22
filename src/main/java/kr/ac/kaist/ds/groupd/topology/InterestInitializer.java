@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import kr.ac.kaist.ds.groupd.parse.Genre;
 import kr.ac.kaist.ds.groupd.parse.Movie;
 import kr.ac.kaist.ds.groupd.parse.MovieParser;
@@ -42,7 +43,7 @@ public class InterestInitializer implements Control {
 		for (int i = 0; i < Network.size(); i++) {
 			List<Rating> filteredRatings = ratingsByUserId.get(Long.valueOf(i + 1));
 			double[] interestVector = createInterestVector(filteredRatings);
-			InterestProtocol protocol = (InterestProtocol) Network.get(i)
+			InterestProtocolImpl protocol = (InterestProtocolImpl) Network.get(i)
 					.getProtocol(pid);
 			protocol.setInterestVector(interestVector);
 		}
