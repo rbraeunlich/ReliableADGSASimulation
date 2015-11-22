@@ -43,13 +43,13 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
     public double compareWithGroupName(GroupName<String> otherName) {
         String other = otherName.getName();
         String thisName = this.groupName.getName();
-        int difference = Math.abs(other.length() - thisName.length());
+        int difference = other.length() - thisName.length();
         // the other one is shorter
         if (difference < 0) {
-            other = fillNameToEqualLength(other, difference);
+            other = fillNameToEqualLength(other, Math.abs(difference));
         } else if (difference > 0) {
             // this name is shorter
-            thisName = fillNameToEqualLength(thisName, difference);
+            thisName = fillNameToEqualLength(thisName, Math.abs(difference));
         }
         return compareNamesByBits(other, thisName);
     }

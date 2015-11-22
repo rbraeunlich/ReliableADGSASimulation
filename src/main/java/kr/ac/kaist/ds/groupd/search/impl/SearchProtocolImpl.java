@@ -24,7 +24,6 @@ public class SearchProtocolImpl implements SearchProtocol {
 	private void performSearch() {
 
 	}
-
 	/**
 	 * Performs the backtracking, based on our group naming scheme.
 	 */
