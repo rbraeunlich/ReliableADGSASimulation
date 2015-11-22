@@ -4,14 +4,12 @@ import java.util.Date;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
-import kr.ac.kaist.ds.groupd.topology.InterestProtocol;
+import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Network;
 import peersim.core.Node;
 
 public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
-
-	private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 
 	private GroupName<String> groupName;
 
@@ -43,12 +41,13 @@ public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
 			return groupName;
 		}
 		Node node = findNode();
-		InterestProtocol interestProtocol = (InterestProtocol) node.getProtocol(interestProtocolPid);
+		InterestProtocolImpl interestProtocol = (InterestProtocolImpl) node.getProtocol(interestProtocolPid);
 		Node representative = interestProtocol.getRepresentative();
 		//FIXME for now we use the ID and do not generate a MAC address
 		long id = representative.getID();
 		long timestamp = new Date().getTime();
-		return new StaticGroupName(String.valueOf(id), timestamp);
+		groupName = new StaticGroupName(String.valueOf(id), timestamp);
+		return groupName;
 	}
 
 	private Node findNode() {

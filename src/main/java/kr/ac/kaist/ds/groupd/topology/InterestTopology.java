@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import kr.ac.kaist.ds.groupd.information.GroupInformation;
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
@@ -28,7 +27,7 @@ public class InterestTopology extends WireGraph {
     private final double clusteringCoefficient;
 
     /**
-     * {@link InterestProtocol} pid
+	 * {@link InterestProtocol} pid
      */
     private final int pid;
 
@@ -126,9 +125,11 @@ public class InterestTopology extends WireGraph {
 	 * @param node2
 	 * @return
 	 */
-    private double calculateSimilarity(Node node, Node node2) {
-        InterestProtocol nodeProtocol = (InterestProtocol)node.getProtocol(pid);
-        InterestProtocol node2Protocol = (InterestProtocol)node2.getProtocol(pid);
+	private double calculateSimilarity(Node node, Node node2) {
+		InterestProtocolImpl nodeProtocol = (InterestProtocolImpl) node
+				.getProtocol(pid);
+		InterestProtocolImpl node2Protocol = (InterestProtocolImpl) node2
+				.getProtocol(pid);
 		double[] interest = nodeProtocol.getInterest();
 		double[] interest2 = node2Protocol.getInterest();
 		double dotProduct = calculateDotProduct(interest, interest2);
@@ -151,90 +152,102 @@ public class InterestTopology extends WireGraph {
 	/**
 	 * Creates the global community by initiating the voting mechanism for candidates and representatives.
 	 */
-    private void createGlobalCommunities(Graph g) {
-        candidateSelectionAndVote(g);
-        potentialRepresentativeIndentification(g);
-        actualRepresentativeElection(g);
-    }
+	private void createGlobalCommunities(Graph g) {
+		candidateSelectionAndVote(g);
+		potentialRepresentativeIndentification(g);
+		actualRepresentativeElection(g);
+	}
 
-    /**
-     * The most similiar neighbours get a vote. The number of votes that can be
-     * given is defined {@link #numberCandidateVotes}
-     */
-    private void candidateSelectionAndVote(Graph g) {
-        for (Node node : new GraphIteratorWrapper(g)) {
-            InterestProtocol protocol = (InterestProtocol)node.getProtocol(pid);
-            Collection<Node> neighbours = protocol.getInterestCommunity();
-            // FIXME I assume that no two neighbors have the same similarity
-            TreeMap<Double, Node> votings = new TreeMap<Double, Node>();
-            for (Node node2 : neighbours) {
-                double similarity = calculateSimilarity(node, node2);
-                votings.put(similarity, node2);
-            }
-            List<Entry<Double, Node>> listVotings = new ArrayList<Entry<Double, Node>>(
-                    votings.entrySet());
-            listVotings.stream().sorted((v, v2) -> v.getKey().compareTo(v2.getKey()))
-                    .limit(numberCandidateVotes).map(c -> c.getValue())
-                    .map(n -> (InterestProtocol)n.getProtocol(pid))
-                    .forEach((p) -> p.receiveCandidateVote());
-        }
-    }
+	/**
+	 * The most similiar neighbours get a vote. The number of votes that can be
+	 * given is defined {@link #numberCandidateVotes}
+	 */
+	private void candidateSelectionAndVote(Graph g) {
+		for (Node node : new GraphIteratorWrapper(g)) {
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+					.getProtocol(pid);
+			Collection<Node> neighbours = protocol.getInterestCommunity();
+			// FIXME I assume that no two neighbors have the same similarity
+			TreeMap<Double, Node> votings = new TreeMap<Double, Node>();
+			for (Node node2 : neighbours) {
+				double similarity = calculateSimilarity(node, node2);
+				votings.put(similarity, node2);
+			}
+			List<Entry<Double, Node>> listVotings = new ArrayList<Entry<Double, Node>>(
+					votings.entrySet());
+			listVotings.stream()
+					.sorted((v, v2) -> v.getKey().compareTo(v2.getKey()))
+					.limit(numberCandidateVotes).map(c -> c.getValue())
+					.map(n -> (InterestProtocolImpl) n.getProtocol(pid))
+					.forEach(p -> p.receiveCandidateVote());
+		}
+	}
 
-    /**
-     * Every node, that crossed the {@link #representativeThreshold} is a
-     * prospective representative peer.
-     */
-    private void potentialRepresentativeIndentification(Graph g) {
-        for (Node node : new GraphIteratorWrapper(g)) {
-            InterestProtocol protocol = (InterestProtocol)node.getProtocol(pid);
-            Collection<Node> neighbours = protocol.getInterestCommunity();
-            Collection<Node> candidates = new ArrayList<Node>(neighbours);
-            candidates.add(node);
-            List<Node> representativeCandidates = candidates
-                    .stream()
-                    .filter(n -> ((InterestProtocol)n.getProtocol(pid)).getCandidateVotes() > representativeThreshold)
-                    .collect(Collectors.toList());
-            double minDistance = Double.MAX_VALUE;
-            Node representative = null;
-            for (Node node2 : representativeCandidates) {
-                double similarity = calculateSimilarity(node, node2);
-                if (1 - similarity < minDistance) {
-                    minDistance = 1 - similarity;
-                    representative = node2;
-                }
-            }
-            ((InterestProtocol)representative.getProtocol(pid)).receiveRepresentativeVote();
-        }
-    }
+	/**
+	 * Every node, that crossed the {@link #representativeThreshold} is a
+	 * prospective representative peer.
+	 */
+	private void potentialRepresentativeIndentification(Graph g) {
+		for (Node node : new GraphIteratorWrapper(g)) {
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+					.getProtocol(pid);
+			Collection<Node> neighbours = protocol.getInterestCommunity();
+			Collection<Node> candidates = new ArrayList<Node>(neighbours);
+			candidates.add(node);
+			List<Node> representativeCandidates = candidates
+					.stream()
+					.filter(n -> ((InterestProtocolImpl) n.getProtocol(pid))
+							.getCandidateVotes() > representativeThreshold)
+					.collect(Collectors.toList());
+			double minDistance = Double.MAX_VALUE;
+			Node representative = null;
+			for (Node node2 : representativeCandidates) {
+				double similarity = calculateSimilarity(node, node2);
+				if (1 - similarity < minDistance) {
+					minDistance = 1 - similarity;
+					representative = node2;
+				}
+			}
+			((InterestProtocolImpl) representative.getProtocol(pid))
+					.receiveRepresentativeVote();
+		}
+	}
 
-    private void actualRepresentativeElection(Graph g) {
-        // I will skip the special cases for now, see
-        // A peer-to-peer recommender system for self-emerging user communities
-        // based on gossip overlays (2013)
-        // for that
-        for (Node node : new GraphIteratorWrapper(g)) {
-            InterestProtocol protocol = (InterestProtocol)node.getProtocol(pid);
-            List<Node> neighbours = new ArrayList<Node>(protocol.getInterestCommunity());
-            neighbours.add(node);
-            List<Node> representative = neighbours
-                    .stream()
-                    .filter(n -> ((InterestProtocol)n.getProtocol(pid)).getRepresentativeVotes() > 0)
-                    .sorted((n, n2) -> ((InterestProtocol)n.getProtocol(pid))
-                            .getRepresentativeVotes().compareTo(
-                                    ((InterestProtocol)n2.getProtocol(pid))
-                                            .getRepresentativeVotes())).limit(1)
-                    .collect(Collectors.toList());
-            protocol.setRepresentative(representative.get(0));
-        }
-    }
+	/**
+	 * The candidate with the most votes will be selected as representative.
+	 */
+	private void actualRepresentativeElection(Graph g) {
+		// I will skip the special cases for now, see
+		// A peer-to-peer recommender system for self-emerging user communities
+		// based on gossip overlays (2013)
+		// for that
+		for (Node node : new GraphIteratorWrapper(g)) {
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+					.getProtocol(pid);
+			List<Node> neighbours = new ArrayList<Node>(
+					protocol.getInterestCommunity());
+			neighbours.add(node);
+			List<Node> representative = neighbours
+					.stream()
+					.filter(n -> ((InterestProtocolImpl) n.getProtocol(pid))
+							.getRepresentativeVotes() > 0)
+					.sorted((n, n2) -> ((InterestProtocolImpl) n.getProtocol(pid))
+							.getRepresentativeVotes().compareTo(
+									((InterestProtocolImpl) n2.getProtocol(pid))
+											.getRepresentativeVotes()))
+					.limit(1).collect(Collectors.toList());
+			protocol.setRepresentative(representative.get(0));
+		}
+	}
 
-    private void resetVotes(Graph g) {
-        for (int i = 0; i < g.size(); i++) {
-            Node node = (Node)g.getNode(i);
-            InterestProtocol protocol = (InterestProtocol)node.getProtocol(pid);
-            protocol.resetVotes();
-        }
-    }
+	private void resetVotes(Graph g) {
+		for (int i = 0; i < g.size(); i++) {
+			Node node = (Node) g.getNode(i);
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+					.getProtocol(pid);
+			protocol.resetVotes();
+		}
+	}
 
 	/**
 	 * Wraps a graph with an {@link Iterable} to be able to use it inside a for-each loop.
