@@ -24,8 +24,10 @@ public class SearchProtocolImpl implements SearchProtocol {
     private GroupNameProtocol groupNameProtocol;
 
     private SearchQuery searchQuery;
-    
+
     static ArrayList<Long> checkForPeers;
+
+    private ArrayList<Node> celculateForDegrees;
 
     private boolean token;
 
@@ -45,24 +47,45 @@ public class SearchProtocolImpl implements SearchProtocol {
      */
     private void performSearch(Node node, int pid) {
 
-        //1~2
-        if(checkForPeers.contains(node.getID()))
+        long degee;
+
+        // 1~2
+        if (checkForPeers.contains(node.getID()))
             return;
         else
             checkForPeers.add(node.getID());
-        
-        //3~4 token will be change other.
+
+        // 3~4 token will be change other.
         if (true == token) {
 
             Linkable linkable = (Linkable)node.getProtocol(FastConfig.getLinkable(pid));
 
             for (int i = 0; i < linkable.degree(); i++) {
-                Node neighbor = linkable.getNeighbor(CommonState.r.nextInt(i));
+                Node neighbor = linkable.getNeighbor(i);
                 TokenProtocol protocol = (TokenProtocol)neighbor.getProtocol(pid);
                 protocol.setToken(true);
+                celculateForDegrees.add(linkable.getNeighbor(i));
             }
+
+            for (int i = 0; i < celculateForDegrees.size(); i++) {
+                for (int j = 0; j < checkForPeers.size(); j++) {
+                    if (celculateForDegrees.get(i).getID() == checkForPeers.get(j)) {
+                        celculateForDegrees.remove(i);
+                        continue;
+                    }
+                }
+            }
+            
+            //5~6
+            degee = (Degree(celculateForDegrees));
+
         }
 
+    }
+    
+    private long Degree(ArrayList<Node> S)
+    {
+        return -1;
     }
 
     /**
