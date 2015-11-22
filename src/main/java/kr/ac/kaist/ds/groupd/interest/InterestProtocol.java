@@ -1,7 +1,9 @@
 package kr.ac.kaist.ds.groupd.interest;
 
 import peersim.cdsim.CDProtocol;
+
 import java.util.Collection;
+
 import peersim.core.Node;
 
 public interface InterestProtocol extends CDProtocol {

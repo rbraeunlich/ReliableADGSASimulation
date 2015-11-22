@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import peersim.core.Linkable;
 import peersim.core.Node;
 import peersim.core.Protocol;
 
-public class InterestProtocolImpl implements Protocol, Linkable {
+public class InterestProtocolImpl implements InterestProtocol,Protocol, Linkable {
 
 	private List<Node> interestCommunity = new ArrayList<Node>();
     //private List<Node> interestCommunity = new ArrayList<Node>();
@@ -142,4 +143,22 @@ public class InterestProtocolImpl implements Protocol, Linkable {
 		}
 		return Math.sqrt(sum);
 	}
+
+    @Override
+    public void nextCycle(Node arg0, int arg1) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void startElection() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Collection<Node> getNeighbors() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
