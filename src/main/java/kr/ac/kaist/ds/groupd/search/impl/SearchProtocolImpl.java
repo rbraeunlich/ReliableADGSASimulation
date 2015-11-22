@@ -47,7 +47,7 @@ public class SearchProtocolImpl implements SearchProtocol {
      */
     private void performSearch(Node node, int pid) {
 
-        long degee;
+        long Pm;
 
         // 1~2
         if (checkForPeers.contains(node.getID()))
@@ -67,6 +67,9 @@ public class SearchProtocolImpl implements SearchProtocol {
                 celculateForDegrees.add(linkable.getNeighbor(i));
             }
 
+            /*
+             * verify that already came out path(node)
+             */
             for (int i = 0; i < celculateForDegrees.size(); i++) {
                 for (int j = 0; j < checkForPeers.size(); j++) {
                     if (celculateForDegrees.get(i).getID() == checkForPeers.get(j)) {
@@ -76,17 +79,40 @@ public class SearchProtocolImpl implements SearchProtocol {
                 }
             }
             
-            //5~6
-            degee = (Degree(celculateForDegrees));
+            //5~9
+            Pm = Degree(celculateForDegrees,pid);
+            
+            //10 ~ 11
+            
+            
 
         }
 
     }
     
-    private long Degree(ArrayList<Node> S)
+    // implement after
+    boolean checkSuccessfulllySendingMessage()
     {
-        // i Dont know how to realization this part
-        return -1;
+        return false;
+        
+    }
+    
+    
+    /**
+     * Return biggest Degree Number Id;
+     * @param S
+     * @return
+     */
+    private long Degree(ArrayList<Node> S, int pid)
+    {
+        long result = -1;
+        
+        for(int i = 0 ; i <S.size() ; i++)
+        {
+            Linkable linkable = (Linkable)S.get(i).getProtocol(FastConfig.getLinkable(pid));
+             result=((linkable.degree()> result )? linkable.degree(): result) ;
+        }
+        return result;
     }
 
     /**
