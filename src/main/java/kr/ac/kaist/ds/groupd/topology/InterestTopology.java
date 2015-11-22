@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import kr.ac.kaist.ds.groupd.information.GroupInformation;
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
+import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Node;
 import peersim.dynamics.WireGraph;
@@ -97,8 +100,8 @@ public class InterestTopology extends WireGraph {
                     g.setEdge(i, j);
                     InterestProtocol nodeProtocol = (InterestProtocol)node1.getProtocol(pid);
                     InterestProtocol node2Protocol = (InterestProtocol)node2.getProtocol(pid);
-                    nodeProtocol.addNeighbor(node2);
-                    node2Protocol.addNeighbor(node1);
+                    ((InterestProtocolImpl)nodeProtocol).addNeighbor(node2);
+                    ((InterestProtocolImpl)node2Protocol).addNeighbor(node1);
 
                     if (false == InterestInitializer.getManagerGroups().existNodeInManagerGroups(
                             node2))

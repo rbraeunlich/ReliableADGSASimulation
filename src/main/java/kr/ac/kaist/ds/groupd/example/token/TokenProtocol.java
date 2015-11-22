@@ -5,7 +5,6 @@ import java.util.Random;
 
 import peersim.cdsim.CDProtocol;
 import peersim.config.FastConfig;
-import peersim.core.CommonState;
 import peersim.core.Linkable;
 import peersim.core.Node;
 import peersim.vector.SingleValueHolder;
