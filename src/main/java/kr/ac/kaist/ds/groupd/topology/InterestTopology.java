@@ -73,7 +73,7 @@ public class InterestTopology extends WireGraph {
             Node node1 = (Node)g.getNode(i);
          //   System.out.println("test :"
            //         + InterestInitializer.getManagerGroups().existnodeInManagerGroups(node1));
-        if(0== i)
+        if(0 == i)
             InterestInitializer.getManagerGroups().addNode(node1);
         else
             if(false == InterestInitializer.getManagerGroups().existNodeInManagerGroups(
@@ -82,6 +82,7 @@ public class InterestTopology extends WireGraph {
                 GroupInformation temp = new GroupInformation(InterestInitializer.getManagerGroups().getAllGroupInformations().size()+1);
                 InterestInitializer.getManagerGroups().addGroupInformation(temp);
                 InterestInitializer.getManagerGroups().setNowGroupIndex(temp);
+                InterestInitializer.getManagerGroups().addNode(node1);
             }
             else if(true == InterestInitializer.getManagerGroups().existNodeInManagerGroups(
                     node1))
@@ -89,8 +90,6 @@ public class InterestTopology extends WireGraph {
         
             //  System.out.println("test :"
          //           + InterestInitializer.getManagerGroups().existnodeInManagerGroups(node1)+"\nsize:"+g.size());
-
-        System.out.println("chenck group size :" +InterestInitializer.getManagerGroups().getNowGroupIndex());
         
             for (int j = i + 1; j < g.size(); j++) {
                 Node node2 = (Node)g.getNode(j);
@@ -102,8 +101,8 @@ public class InterestTopology extends WireGraph {
                     nodeProtocol.addNeighbor(node2);
                     node2Protocol.addNeighbor(node1);
 
-                  //  if (false == InterestInitializer.getManagerGroups().existnodeInManagerGroups(
-                    //        node2))
+                    if (false == InterestInitializer.getManagerGroups().existNodeInManagerGroups(
+                            node2))
                         InterestInitializer.getManagerGroups().addNode(node2);
 
                 }
@@ -118,7 +117,6 @@ public class InterestTopology extends WireGraph {
                                     InterestInitializer.getManagerGroups().getNowGroupIndex())
                             .getNeighborNodes().size());
         }
-      System.exit(0);
     }
 
 	/**
