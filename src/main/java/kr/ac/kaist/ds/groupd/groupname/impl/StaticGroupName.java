@@ -19,7 +19,6 @@ public class StaticGroupName implements GroupName<String> {
 
     @Override
     public int hashCode() {
-        //2^5-1
         final int prime = 31;
         int result = 1;
         result = prime * result + ((macAddress == null) ? 0 : macAddress.hashCode());
@@ -48,6 +47,11 @@ public class StaticGroupName implements GroupName<String> {
         } else if (!timestamp.equals(other.timestamp))
             return false;
         return true;
+    }
+    
+    @Override
+    public String toString() {
+        return "StaticGroupName [groupName=" + macAddress + timestamp + "]";
     }
 
 	
