@@ -46,7 +46,8 @@ public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
 		//FIXME for now we use the ID and do not generate a MAC address
 		long id = representative.getID();
 		long timestamp = new Date().getTime();
-		return new StaticGroupName(String.valueOf(id), timestamp);
+		groupName = new StaticGroupName(String.valueOf(id), timestamp);
+		return groupName;
 	}
 
 	private Node findNode() {
