@@ -49,5 +49,10 @@ public class SearchQuery {
     public boolean isBackward() {
         return backward;
     }
+
+    public void setBackward(boolean backward) {
+        this.backward = backward;
+    }
+    
 	
 }

@@ -56,12 +56,18 @@ public class SearchProtocolImpl implements SearchProtocol {
         SearchProtocol searchProtocol = (SearchProtocol)neighbourWithHighestDegree.getProtocol(pid);
         searchProtocol.setSearchQuery(searchQuery);
 
-        checkResourceLocated(searchProtocol);
+        checkResourceLocated(node);
 
     }
 
-    private void checkResourceLocated(SearchProtocol searchProtocol) {
-        // using similarfunction;
+    private boolean checkResourceLocated(Node node) {
+        if (searchQuery.getDestination() == node.getID())
+            return true;
+        else
+            searchQuery.getVisitedNodes().add(node);
+
+        return false;
+
     }
 
     private Node findNeighbourWithHighestDegree(Linkable linkable) {
@@ -87,6 +93,22 @@ public class SearchProtocolImpl implements SearchProtocol {
         }
     }
 
+    private void findNeighbourstoOriginalPath(Node node,int pid) {
+        Linkable linkable = (Linkable)node.getProtocol(linkableProtocolPid);
+        for (int i = 0; i < linkable.degree(); i++) {
+            for (int j = 0; j < searchQuery.getVisitedNodes().size(); j++) {
+                if (searchQuery.getVisitedNodes().get(j).getID() == linkable.getNeighbor(i).getID()) {
+                    SearchProtocol searchProtocol = (SearchProtocol)linkable.getNeighbor(i)
+                            .getProtocol(pid);
+                    searchProtocol.getSearchQuery().setBackward(true);
+                } else {
+
+                }
+            }
+
+        }
+    }
+
     /**
      * Performs the backtracking, based on our group naming scheme. backTracking
      * follow previous steps
@@ -95,6 +117,11 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @param node
      */
     private void performBacktracking(Node node, int protocolID) {
+        if (searchQuery.getSource() == node.getID()) {
+            Logger.getLogger(this.getClass().getName()).info("Return to original Path");
+        }
+        searchQuery.setBackward(true);
+        findNeighbourstoOriginalPath(node,protocolID);
 
     }
 
@@ -111,6 +138,11 @@ public class SearchProtocolImpl implements SearchProtocol {
      */
     public void setSearchQuery(SearchQuery q) {
         searchQuery = q;
+    }
+    
+    public SearchQuery getSearchQuery()
+    {
+        return searchQuery;
     }
 
     @Override

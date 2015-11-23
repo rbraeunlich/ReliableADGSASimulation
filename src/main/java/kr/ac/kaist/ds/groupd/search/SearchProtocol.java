@@ -16,5 +16,7 @@ public interface SearchProtocol extends CDProtocol {
 	 * @param q
 	 */
 	void receiveSearchQuery(SearchQuery q);
+	
+	SearchQuery getSearchQuery();
 
 }
