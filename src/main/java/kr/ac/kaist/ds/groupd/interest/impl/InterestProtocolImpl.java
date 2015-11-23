@@ -61,7 +61,9 @@ public class InterestProtocolImpl implements InterestProtocol {
     @Override
     public Object clone() {
         try {
-            return super.clone();
+            InterestProtocolImpl clone = (InterestProtocolImpl) super.clone();
+            clone.interestCommunity = new LinkedHashSet<Node>();
+			return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
@@ -176,11 +178,9 @@ public class InterestProtocolImpl implements InterestProtocol {
             Node neighbour = links.getNeighbor(i);
             double similarity = calculateSimilarity(node, neighbour, protocolID);
             if (similarity > clusteringCoefficient) {
-                InterestProtocolImpl nodeProtocol = (InterestProtocolImpl)node
-                        .getProtocol(protocolID);
                 InterestProtocolImpl node2Protocol = (InterestProtocolImpl)neighbour
                         .getProtocol(protocolID);
-                nodeProtocol.addNeighbor(neighbour);
+                this.addNeighbor(neighbour);
                 node2Protocol.addNeighbor(node);
             }
         }
