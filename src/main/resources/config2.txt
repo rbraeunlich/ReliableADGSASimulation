@@ -1,4 +1,4 @@
-simulation.cycles 1
+simulation.cycles 2
 #the number of users in the movielens 1 mio. dataset
 network.size 6040
 
@@ -6,20 +6,22 @@ network.size 6040
 
 protocol.link IdleProtocol
 
-protocol.interest InterestProtocol
+protocol.interest kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl
+protocol.interest.linkable link
+protocol.interest.coeff 0.9
+protocol.interest.candVotes 5
+protocol.interest.repThreshold 1
 
 ################### initialization ======================
 
 init.0 InterestInitializer
 init.0.protocol interest
 
-init.1 kr.ac.kaist.ds.groupd.topology.InterestTopology
-init.1.protocol link
-init.1.interest_protocol interest
-init.1.coeff 0.9
-init.1.candVotes 5
-init.1.repThreshold 10
-init.1.undir
+init.rnd WireKOut
+init.rnd.protocol link
+# degree of nodes
+init.rnd.k 50
+init.rnd.undir
 
 ################ control ==============================
 

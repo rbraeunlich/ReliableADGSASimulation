@@ -92,7 +92,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
         Node node = findNode();
         InterestProtocolImpl interestProtocol = (InterestProtocolImpl)node
                 .getProtocol(interestProtocolPid);
-        Collection<Node> interestCommunity = new HashSet<>(interestProtocol.getInterestCommunity());
+        Collection<Node> interestCommunity = new HashSet<>(interestProtocol.getNeighbours());
         interestCommunity.add(node);
         String groupId = interestCommunity.stream()
                 .sorted((n1, n2) -> Long.compare(n1.getID(), n2.getID()))

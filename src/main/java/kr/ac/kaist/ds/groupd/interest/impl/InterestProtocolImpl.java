@@ -1,139 +1,360 @@
+
 package kr.ac.kaist.ds.groupd.interest.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
+import peersim.config.Configuration;
 import peersim.core.Linkable;
 import peersim.core.Node;
-import peersim.core.Protocol;
 
-public class InterestProtocolImpl implements Protocol, Linkable {
+public class InterestProtocolImpl implements InterestProtocol {
 
-	private List<Node> interestCommunity = new ArrayList<Node>();
-	private int candidateVotes = 0;
-	private int representativeVotes;
-	private Node representative;
-	private double[] interestVector;
-	private double magnitude = 0.0;
+    private static final String PAR_LINKABLE_PROTOCOL = "linkable";
 
-	public InterestProtocolImpl(String prefix) {
-	}
+    private static final String PAR_CLUSTER_COEFF = "coeff";
 
-	public double[] getInterest() {
-		return interestVector;
-	}
+    private static final String PAR_NR_CAND_VOTES = "candVotes";
 
-	@Override
-	public Object clone() {
-		try {
-			return super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+    private static final String PAR_REP_THRESHOLD = "repThreshold";
 
-	public Collection<Node> getInterestCommunity() {
-		return interestCommunity;
-	}
+    private Set<Node> interestCommunity = new LinkedHashSet<Node>();
 
-	/**
-	 * Increases the candidate votes by one.
-	 */
-	public void receiveCandidateVote() {
-		candidateVotes++;
-	}
+    private int candidateVotes = 0;
 
-	public int getCandidateVotes() {
-		return candidateVotes;
-	}
+    private int representativeVotes;
 
-	/**
-	 * Increases the representative votes by one.
-	 */
-	public void receiveRepresentativeVote() {
-		representativeVotes++;
-	}
-	
-	public Integer getRepresentativeVotes(){
-		return representativeVotes;
-	}
+    private Node representative;
 
-	public void setRepresentative(Node node) {
-		this.representative = node;
-	}
+    private double[] interestVector;
 
-	/**
-	 * Sets candidate and representative votings to zero.
-	 * Has to be called after an election finishes.
-	 */
-	public void resetVotes() {
-		candidateVotes = 0;
-		representativeVotes = 0;
-	}
+    private double magnitude = 0.0;
 
-	public Node getRepresentative() {
-		return representative;
-	}
+    private boolean startElection = true;
 
-	@Override
-	public void onKill() {
-		//FIXME
-	}
+    private final double clusteringCoefficient;
 
-	@Override
-	public int degree() {
-		return interestCommunity.size();
-	}
+    private int linkableProtocolPid;
 
-	@Override
-	public Node getNeighbor(int i) {
-		return interestCommunity.get(i);
-	}
+    private final int numberCandidateVotes;
 
-	@Override
-	public boolean addNeighbor(Node neighbour) {
-		if(contains(neighbour)){
-			return false;
-		}
-		return interestCommunity.add(neighbour);
-	}
+    private final int representativeThreshold;
 
-	@Override
-	public boolean contains(Node neighbor) {
-		return interestCommunity.contains(neighbor);
-	}
+    public InterestProtocolImpl(String prefix) {
+        clusteringCoefficient = Configuration.getDouble(prefix + "." + PAR_CLUSTER_COEFF);
+        this.linkableProtocolPid = Configuration.getPid(prefix + "." + PAR_LINKABLE_PROTOCOL);
+        numberCandidateVotes = Configuration.getInt(prefix + "." + PAR_NR_CAND_VOTES);
+        representativeThreshold = Configuration.getInt(prefix + "." + PAR_REP_THRESHOLD);
+    }
 
-	@Override
-	public void pack() {
-	}
+    public double[] getInterest() {
+        return interestVector;
+    }
 
-	public void setInterestVector(double[] interestVector) {
-		this.interestVector = interestVector;
-		this.magnitude = calculateMagnitude(this.interestVector);
-	}
-	
-	/**
-	 * Returns the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
-	 * of the vector that is returned by {@link #getInterest()}. The magnitude is precomputed because it is needed quite often.
-	 * @return
-	 */
-	public double getMagnitude(){
-		return magnitude;
-	}
-	
-	/**
-	 * Calculates the <a href="https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">magnitude</a>
-	 * of a vector.
-	 * @param vector
-	 * @return
-	 */
-	private double calculateMagnitude(double[] vector) {
-		double sum = 0.0;
-		for(int i = 0; i < vector.length; i++){
-			sum += Math.pow(vector[i], 2.0);
-		}
-		return Math.sqrt(sum);
-	}
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Increases the candidate votes by one.
+     */
+    public void receiveCandidateVote() {
+        candidateVotes++;
+    }
+
+    public int getCandidateVotes() {
+        return candidateVotes;
+    }
+
+    /**
+     * Increases the representative votes by one.
+     */
+    public void receiveRepresentativeVote() {
+        representativeVotes++;
+    }
+
+    public Integer getRepresentativeVotes() {
+        return representativeVotes;
+    }
+
+    public void setRepresentative(Node node) {
+        this.representative = node;
+    }
+
+    /**
+     * Sets candidate and representative votings to zero. Has to be called after
+     * an election finishes.
+     * 
+     * @param protocolID
+     * @param node
+     */
+    private void resetVotes(Node node, int protocolID) {
+        resetVotes();
+        for (Node n : getNeighbours()) {
+            InterestProtocol protocol = (InterestProtocol)n.getProtocol(protocolID);
+            protocol.resetVotes();
+        }
+    }
+
+    public Node getRepresentative() {
+        return representative;
+    }
+
+    public void setInterestVector(double[] interestVector) {
+        this.interestVector = interestVector;
+        this.magnitude = calculateMagnitude(this.interestVector);
+    }
+
+    /**
+     * Returns the <a href=
+     * "https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">
+     * magnitude</a> of the vector that is returned by {@link #getInterest()}.
+     * The magnitude is precomputed because it is needed quite often.
+     * 
+     * @return
+     */
+    public double getMagnitude() {
+        return magnitude;
+    }
+
+    /**
+     * Calculates the <a href=
+     * "https://en.wikipedia.org/wiki/Magnitude_%28mathematics%29#Euclidean_vector_space">
+     * magnitude</a> of a vector.
+     * 
+     * @param vector
+     * @return
+     */
+    private double calculateMagnitude(double[] vector) {
+        double sum = 0.0;
+        for (int i = 0; i < vector.length; i++) {
+            sum += Math.pow(vector[i], 2.0);
+        }
+        return Math.sqrt(sum);
+    }
+
+    @Override
+    public void nextCycle(Node node, int protocolID) {
+        if (startElection) {
+            startCommunityFormation(node, protocolID);
+            startElection = false;
+        }
+    }
+
+    private void startCommunityFormation(Node node, int protocolID) {
+        createLocalCommunities(node, protocolID);
+        createGlobalCommunities(node, protocolID);
+        resetVotes(node, protocolID);
+    }
+
+    /**
+     * Creates the local community by creating edges between nodes whose
+     * similarity is greater than the {@link #clusteringCoefficient}.
+     * 
+     * @param protocolID
+     * @param node
+     */
+    private void createLocalCommunities(Node node, int protocolID) {
+        // since I do not know how to combine two Linkable protocols
+        // I use this workaround which assumes, that all nodes can see each
+        // other
+        Linkable links = (Linkable)node.getProtocol(linkableProtocolPid);
+        for (int i = 0; i < links.degree(); i++) {
+            Node neighbour = links.getNeighbor(i);
+            double similarity = calculateSimilarity(node, neighbour, protocolID);
+            if (similarity > clusteringCoefficient) {
+                InterestProtocolImpl nodeProtocol = (InterestProtocolImpl)node
+                        .getProtocol(protocolID);
+                InterestProtocolImpl node2Protocol = (InterestProtocolImpl)neighbour
+                        .getProtocol(protocolID);
+                nodeProtocol.addNeighbor(neighbour);
+                node2Protocol.addNeighbor(node);
+            }
+        }
+    }
+
+    /**
+     * Calculates the similarity based on the cosine similarity. See
+     * <a href="https://en.wikipedia.org/wiki/Cosine_similarity">Wikipedia<a/>
+     * 
+     * @param node
+     * @param node2
+     * @param protocolID
+     * @return
+     */
+    private double calculateSimilarity(Node node, Node node2, int protocolID) {
+        InterestProtocolImpl nodeProtocol = (InterestProtocolImpl)node.getProtocol(protocolID);
+        InterestProtocolImpl node2Protocol = (InterestProtocolImpl)node2.getProtocol(protocolID);
+        double[] interest = nodeProtocol.getInterest();
+        double[] interest2 = node2Protocol.getInterest();
+        double dotProduct = calculateDotProduct(interest, interest2);
+        double magnitude = nodeProtocol.getMagnitude();
+        double magnitude2 = node2Protocol.getMagnitude();
+        return dotProduct / (magnitude * magnitude2);
+    }
+
+    private double calculateDotProduct(double[] interest, double[] interest2) {
+        if (interest.length != interest2.length) {
+            throw new IllegalArgumentException("Vectors are of unequal length");
+        }
+        double sum = 0.0;
+        for (int i = 0; i < interest.length; i++) {
+            sum += interest[i] * interest2[i];
+        }
+        return sum;
+    }
+
+    /**
+     * Creates the global community by initiating the voting mechanism for
+     * candidates and representatives.
+     * 
+     * @param protocolID
+     * @param node
+     */
+    private void createGlobalCommunities(Node node, int protocolID) {
+        candidateSelectionAndVote(node, protocolID);
+        potentialRepresentativeIndentification(node, protocolID);
+        actualRepresentativeElection(node, protocolID);
+    }
+
+    /**
+     * The most similiar neighbours get a vote. The number of votes that can be
+     * given is defined {@link #numberCandidateVotes}
+     * 
+     * @param protocolID
+     * @param node
+     */
+    private void candidateSelectionAndVote(Node node, int protocolID) {
+        TreeMap<Node, Double> votings = new TreeMap<Node, Double>();
+        for (Node neighbour : getNeighbours()) {
+            double similarity = calculateSimilarity(node, neighbour, protocolID);
+            votings.put(new ComparableNode(neighbour), similarity);
+        }
+        List<Entry<Node, Double>> listVotings = new ArrayList<Entry<Node, Double>>(
+                votings.entrySet());
+        listVotings.stream().sorted((v, v2) -> v.getValue().compareTo(v2.getValue()))
+                .limit(numberCandidateVotes).map(c -> c.getKey())
+                .map(n -> (InterestProtocolImpl)n.getProtocol(protocolID))
+                .forEach(p -> p.receiveCandidateVote());
+    }
+
+    /**
+     * Every node, that crossed the {@link #representativeThreshold} is a
+     * prospective representative peer.
+     */
+    private void potentialRepresentativeIndentification(Node node, int protocolID) {
+        Collection<Node> candidates = new ArrayList<Node>(getNeighbours());
+        candidates.add(node);
+        List<Node> representativeCandidates = candidates.stream()
+                .filter(n -> ((InterestProtocolImpl)n.getProtocol(protocolID))
+                        .getCandidateVotes() >= representativeThreshold)
+                .collect(Collectors.toList());
+        double minDistance = Double.MAX_VALUE;
+        Node representative = null;
+        for (Node node2 : representativeCandidates) {
+            double similarity = calculateSimilarity(node, node2, protocolID);
+            if (1 - similarity < minDistance) {
+                minDistance = 1 - similarity;
+                representative = node2;
+            }
+        }
+        // we just give one representative vote at the moment
+        ((InterestProtocolImpl)representative.getProtocol(protocolID)).receiveRepresentativeVote();
+    }
+
+    /**
+     * The candidate with the most votes will be selected as representative.
+     */
+    private void actualRepresentativeElection(Node node, int protocolID) {
+        // I will skip the special cases for now, see
+        // A peer-to-peer recommender system for self-emerging user communities
+        // based on gossip overlays (2013)
+        // for that
+        Collection<Node> candidates = new ArrayList<Node>(getNeighbours());
+        candidates.add(node);
+        List<Node> representative = candidates.stream()
+                .filter(n -> ((InterestProtocolImpl)n.getProtocol(protocolID))
+                        .getRepresentativeVotes() > 0)
+                .sorted((n,
+                        n2) -> ((InterestProtocolImpl)n.getProtocol(protocolID))
+                                .getRepresentativeVotes()
+                                .compareTo(((InterestProtocolImpl)n2.getProtocol(protocolID))
+                                        .getRepresentativeVotes()))
+                .limit(1).collect(Collectors.toList());
+        this.setRepresentative(representative.get(0));
+    }
+
+    @Override
+    public void startElection() {
+        this.startElection = true;
+    }
+
+    @Override
+    public Set<Node> getNeighbours() {
+        return interestCommunity;
+    }
+
+    @Override
+    public void setNeighbours(Set<Node> neighbours) {
+        this.interestCommunity = neighbours;
+    }
+
+    @Override
+    public boolean removeNeighbour(Node toRemove) {
+        return interestCommunity.remove(toRemove);
+    }
+
+    @Override
+    public void resetVotes() {
+        candidateVotes = 0;
+        representativeVotes = 0;
+    }
+
+    @Override
+    public int degree() {
+        return interestCommunity.size();
+    }
+
+    @Override
+    public Node getNeighbor(int i) {
+        int j = 0;
+        for (Node n : interestCommunity) {
+            if(j == i){
+                return n;
+            }
+            j++;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean addNeighbor(Node neighbour) {
+        return interestCommunity.add(neighbour);
+    }
+
+    @Override
+    public boolean contains(Node neighbor) {
+        return interestCommunity.contains(neighbor);
+    }
+
+    @Override
+    public void pack() {
+    }
+
+    @Override
+    public void onKill() {
+    }
 }
