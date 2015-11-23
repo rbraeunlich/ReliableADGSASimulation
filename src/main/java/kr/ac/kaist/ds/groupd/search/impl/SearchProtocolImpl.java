@@ -46,9 +46,7 @@ public class SearchProtocolImpl implements SearchProtocol {
      */
     private void performSearch(Node node, int pid) {
         // target reached
-        if (searchQuery.getDestination() == node.getID()) {
-            Logger.getLogger(this.getClass().getName()).info("Target reached");
-        }
+
         sendQueryToNeighboursWithProbability(node, pid);
         Linkable linkable = (Linkable)node.getProtocol(linkableProtocolPid);
         Node neighbourWithHighestDegree = findNeighbourWithHighestDegree(linkable);
@@ -117,10 +115,6 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @param node
      */
     private void performBacktracking(Node node, int protocolID) {
-        if (searchQuery.getSource() == node.getID()) {
-            Logger.getLogger(this.getClass().getName()).info("Return to original Path");
-        }
-        searchQuery.setBackward(true);
         findNeighbourstoOriginalPath(node,protocolID);
 
     }
