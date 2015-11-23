@@ -27,4 +27,6 @@ public interface GroupNameProtocol<T> extends CDProtocol {
 	 * Forms a group names, saves it itself (replacing the existing one) and returns it.
 	 */
 	GroupName<T> createGroupName();
+	
+	void setGroupName(GroupName<T> groupName);
 }

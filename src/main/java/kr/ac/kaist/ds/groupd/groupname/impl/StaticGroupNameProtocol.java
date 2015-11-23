@@ -70,4 +70,9 @@ public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
 	public void nextCycle(Node node, int protocolID) {
 		this.nodeId = node.getID();
 	}
+	
+    @Override
+    public void setGroupName(GroupName<String> groupName) {
+        this.groupName = groupName;
+    }
 }

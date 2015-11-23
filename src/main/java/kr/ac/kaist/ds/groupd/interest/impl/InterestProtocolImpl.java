@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import kr.ac.kaist.ds.groupd.groupname.GroupName;
+import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import peersim.config.Configuration;
 import peersim.core.Linkable;
@@ -24,6 +26,8 @@ public class InterestProtocolImpl implements InterestProtocol {
     private static final String PAR_NR_CAND_VOTES = "candVotes";
 
     private static final String PAR_REP_THRESHOLD = "repThreshold";
+
+    private static final String PAR_NAMING_PROTOCOL = "naming";
 
     private Set<Node> interestCommunity = new LinkedHashSet<Node>();
 
@@ -47,11 +51,14 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     private final int representativeThreshold;
 
+    private int namingProtocolPid;
+
     public InterestProtocolImpl(String prefix) {
-        clusteringCoefficient = Configuration.getDouble(prefix + "." + PAR_CLUSTER_COEFF);
+        this.clusteringCoefficient = Configuration.getDouble(prefix + "." + PAR_CLUSTER_COEFF);
         this.linkableProtocolPid = Configuration.getPid(prefix + "." + PAR_LINKABLE_PROTOCOL);
-        numberCandidateVotes = Configuration.getInt(prefix + "." + PAR_NR_CAND_VOTES);
-        representativeThreshold = Configuration.getInt(prefix + "." + PAR_REP_THRESHOLD);
+        this.numberCandidateVotes = Configuration.getInt(prefix + "." + PAR_NR_CAND_VOTES);
+        this.representativeThreshold = Configuration.getInt(prefix + "." + PAR_REP_THRESHOLD);
+        this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAMING_PROTOCOL);
     }
 
     public double[] getInterest() {
@@ -153,6 +160,19 @@ public class InterestProtocolImpl implements InterestProtocol {
         if (startElection) {
             startCommunityFormation(node, protocolID);
             startElection = false;
+            if(this.getRepresentative().equals(node)){
+                GroupNameProtocol<?> namingProtocol = (GroupNameProtocol<?>)node.getProtocol(namingProtocolPid);
+                createAndSetGroupName(namingProtocol);
+            }
+        }
+    }
+
+    private <T> void createAndSetGroupName(GroupNameProtocol<T> namingProtocol) {
+        GroupName<T> groupName = namingProtocol.createGroupName();
+        for(Node n : getNeighbours()){
+            @SuppressWarnings("unchecked")
+            GroupNameProtocol<T> namingProtocolOther = (GroupNameProtocol<T>)n.getProtocol(namingProtocolPid);
+            namingProtocolOther.setGroupName(groupName);
         }
     }
 

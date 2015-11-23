@@ -130,4 +130,9 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
         }
         return null;
     }
+
+    @Override
+    public void setGroupName(GroupName<String> groupName) {
+        this.groupName = groupName;
+    }
 }
