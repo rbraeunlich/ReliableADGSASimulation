@@ -4,11 +4,13 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.lang.reflect.Field;
 import java.util.Properties;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,7 +35,19 @@ public class DynamicGroupNameProcotolImplTest {
 		Configuration.setConfig(prop);
 		Network.reset();
 	}
-
+	
+    @AfterClass
+    public static void tearDownAfterClass(){
+        try {
+            // workaround because there is no way to reset the configuration
+            Field configField = Configuration.class.getDeclaredField("config");
+            configField.setAccessible(true);
+            configField.set(null, null);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 	@Test
 	public void createGroupNameSingleNode() {
 		DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol(

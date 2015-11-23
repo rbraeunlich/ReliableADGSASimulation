@@ -3,10 +3,12 @@ package kr.ac.kaist.ds.groupd.topology;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,6 +25,18 @@ public class InterestInitializerTest {
 		prop.put("foo.protocol", "bar");
 		prop.put("protocol.bar", "barprot");
 		Configuration.setConfig(prop);
+	}
+	
+	@AfterClass
+	public static void tearDownAfterClass(){
+	    try {
+	        // workaround because there is no way to reset the configuration
+            Field configField = Configuration.class.getDeclaredField("config");
+            configField.setAccessible(true);
+            configField.set(null, null);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 	}
 
 	@Test
