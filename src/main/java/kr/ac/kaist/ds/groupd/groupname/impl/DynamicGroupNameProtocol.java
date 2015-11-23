@@ -40,7 +40,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
     }
 
     @Override
-    public double compareWithGroupName(GroupName<String> otherName) {
+    public boolean compareWithGroupName(GroupName<String> otherName) {
         String other = otherName.getName();
         String thisName = this.groupName.getName();
         int difference = other.length() - thisName.length();
@@ -51,7 +51,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
             // this name is shorter
             thisName = fillNameToEqualLength(thisName, Math.abs(difference));
         }
-        return compareNamesByBits(other, thisName);
+        return (similarityThreshold <= compareNamesByBits(other, thisName));
     }
 
     /**
@@ -100,7 +100,8 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
                     if (s.length() >= bitsUsed) {
                         return s.substring(0, bitsUsed);
                     } else {
-                        for (int i = 0; i <= (bitsUsed - s.length()); i++) {
+                    	int initialLength = s.length();
+                        for (int i = 0; i < (bitsUsed - initialLength); i++) {
                             s = "0" + s;
                         }
                         return s;

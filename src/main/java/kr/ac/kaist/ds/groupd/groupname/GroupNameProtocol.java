@@ -14,11 +14,12 @@ public interface GroupNameProtocol<T> extends CDProtocol {
 
 	static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 	/**
-	 * Compares this group name with another one and returns the grade of similarity.
+	 * Compares this group name with another one and returns true is the name is considered
+	 * to be as similar to the others, so it can be considered the same groupname again.
 	 * @param otherName
 	 * @return
 	 */
-	double compareWithGroupName(GroupName<T> otherName);
+	boolean compareWithGroupName(GroupName<T> otherName);
 
 	GroupName<T> getGroupName();
 	

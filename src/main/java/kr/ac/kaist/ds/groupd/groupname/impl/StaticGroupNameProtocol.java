@@ -23,11 +23,8 @@ public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
 	}
 
 	@Override
-	public double compareWithGroupName(GroupName<String> otherName) {
-		if (otherName.equals(groupName)) {
-			return 1.0;
-		}
-		return 0;
+	public boolean compareWithGroupName(GroupName<String> otherName) {
+		return otherName.equals(groupName);
 	}
 
 	@Override
