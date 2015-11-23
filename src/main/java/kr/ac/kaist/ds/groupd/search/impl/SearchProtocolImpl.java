@@ -2,8 +2,11 @@
 package kr.ac.kaist.ds.groupd.search.impl;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Logger;
 
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
+import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
 import peersim.config.Configuration;
@@ -20,21 +23,20 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private SearchQuery searchQuery;
 
-    static ArrayList<Long> checkForPeers;
-
-    private ArrayList<Node> celculateForDegrees;
-
     private int namingProtocolPid;
 
     private int interestGroupProtocolPid;
 
     private int linkableProtocolPid;
+    
+    private float probabilityPk;
 
     public SearchProtocolImpl(String prefix) {
         this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAME_PROTOCOL);
-        this.interestGroupProtocolPid = Configuration
-                .getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
+        this.interestGroupProtocolPid = Configuration.getPid(prefix + "."
+                + PAR_INTEREST_GROUP_PROTOCOL);
         this.linkableProtocolPid = Configuration.getPid(prefix + "." + PAR_LINKABLE_PROTOCOL);
+        this.probabilityPk = 0.6f;
     }
 
     /**
@@ -45,28 +47,12 @@ public class SearchProtocolImpl implements SearchProtocol {
         if (searchQuery.getDestination() == node.getID()) {
             Logger.getLogger(this.getClass().getName()).info("Target reached");
         }
-        sendQueryToNeighboursWithProbability(node);
+        sendQueryToNeighboursWithProbability(node, pid);
         Linkable linkable = (Linkable)node.getProtocol(linkableProtocolPid);
         Node neighbourWithHighestDegree = findNeighbourWithHighestDegree(linkable);
 
         SearchProtocol searchProtocol = (SearchProtocol)neighbourWithHighestDegree.getProtocol(pid);
         searchProtocol.setSearchQuery(searchQuery);
-        /*
-         * verify that already came out path(node)
-         */
-        //i'm not sure what this is supposed to do...
-        for (int i = 0; i < celculateForDegrees.size(); i++) {
-            for (int j = 0; j < checkForPeers.size(); j++) {
-                if (celculateForDegrees.get(i).getID() == checkForPeers.get(j)) {
-                    celculateForDegrees.remove(i);
-                    continue;
-                }
-            }
-        }
-
-        // 5~9
-
-        // 10 ~ 11
 
     }
 
@@ -74,21 +60,26 @@ public class SearchProtocolImpl implements SearchProtocol {
         Node neighbourWithHighestDegree = linkable.getNeighbor(0);
         for (int i = 1; i < linkable.degree(); i++) {
             Node n = linkable.getNeighbor(i);
-            if (((Linkable)n.getProtocol(linkableProtocolPid))
-                    .degree() > ((Linkable)neighbourWithHighestDegree
-                            .getProtocol(linkableProtocolPid)).degree()) {
+            if (((Linkable)n.getProtocol(linkableProtocolPid)).degree() > ((Linkable)neighbourWithHighestDegree
+                    .getProtocol(linkableProtocolPid)).degree()) {
                 neighbourWithHighestDegree = n;
             }
         }
         return neighbourWithHighestDegree;
     }
 
-    private void sendQueryToNeighboursWithProbability(Node node) {
-        // TODO Auto-generated method stub
-
+    private void sendQueryToNeighboursWithProbability(Node node,int pid) {
+        Linkable linkable = (Linkable)node.getProtocol(linkableProtocolPid);
+        for(int i = 0 ; i < linkable.degree(); i++)
+        {
+            if(probabilityPk < new Random().nextFloat())
+            {
+                SearchProtocol searchProtocol = (SearchProtocol)linkable.getNeighbor(i).getProtocol(pid);
+                searchProtocol.setSearchQuery(searchQuery);
+            }
+        }
     }
-
-    // implement after
+    
     boolean checkSuccessfulllySendingMessage() {
         return false;
 
@@ -109,7 +100,7 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @see kr.ac.kaist.ds.groupd.search.SearchProtocol#setSearchQuery(kr.ac.kaist.ds.groupd.search.SearchQuery)
      */
     public void setSearchQuery(SearchQuery q) {
-
+        searchQuery = q;
     }
 
     @Override
