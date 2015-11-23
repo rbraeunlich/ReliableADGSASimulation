@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -68,9 +69,9 @@ public class InterestProtocolImpl implements InterestProtocol {
     @Override
     public Object clone() {
         try {
-            InterestProtocolImpl clone = (InterestProtocolImpl) super.clone();
+            InterestProtocolImpl clone = (InterestProtocolImpl)super.clone();
             clone.interestCommunity = new LinkedHashSet<Node>();
-			return clone;
+            return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
@@ -160,8 +161,9 @@ public class InterestProtocolImpl implements InterestProtocol {
         if (startElection) {
             startCommunityFormation(node, protocolID);
             startElection = false;
-            if(this.getRepresentative().equals(node)){
-                GroupNameProtocol<?> namingProtocol = (GroupNameProtocol<?>)node.getProtocol(namingProtocolPid);
+            if (this.getRepresentative().equals(node)) {
+                GroupNameProtocol<?> namingProtocol = (GroupNameProtocol<?>)node
+                        .getProtocol(namingProtocolPid);
                 createAndSetGroupName(namingProtocol);
             }
         }
@@ -169,9 +171,10 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     private <T> void createAndSetGroupName(GroupNameProtocol<T> namingProtocol) {
         GroupName<T> groupName = namingProtocol.createGroupName();
-        for(Node n : getNeighbours()){
+        for (Node n : getNeighbours()) {
             @SuppressWarnings("unchecked")
-            GroupNameProtocol<T> namingProtocolOther = (GroupNameProtocol<T>)n.getProtocol(namingProtocolPid);
+            GroupNameProtocol<T> namingProtocolOther = (GroupNameProtocol<T>)n
+                    .getProtocol(namingProtocolPid);
             namingProtocolOther.setGroupName(groupName);
         }
     }
@@ -291,8 +294,11 @@ public class InterestProtocolImpl implements InterestProtocol {
                 representative = node2;
             }
         }
-        // we just give one representative vote at the moment
-        ((InterestProtocolImpl)representative.getProtocol(protocolID)).receiveRepresentativeVote();
+        if (representative != null) {
+            // we just give one representative vote at the moment
+            ((InterestProtocolImpl)representative.getProtocol(protocolID))
+                    .receiveRepresentativeVote();
+        }
     }
 
     /**
@@ -314,7 +320,30 @@ public class InterestProtocolImpl implements InterestProtocol {
                                 .compareTo(((InterestProtocolImpl)n2.getProtocol(protocolID))
                                         .getRepresentativeVotes()))
                 .limit(1).collect(Collectors.toList());
-        this.setRepresentative(representative.get(0));
+        if (!representative.isEmpty()) {
+            this.setRepresentative(representative.get(0));
+        } else {
+            takeMostSimilarRepresentativeFromNeighbours(node, protocolID);
+        }
+    }
+
+    private void takeMostSimilarRepresentativeFromNeighbours(Node node, int protocolID) {
+        Map<Node, Double> similarities = getNeighbours().stream()
+                .collect(Collectors.toMap(n -> n, n -> {
+                    return calculateSimilarity(node, n, protocolID);
+                }));
+        Node potentialRepresentative = similarities.entrySet().stream()
+                .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue())).limit(1)
+                .collect(Collectors.toList()).get(0).getKey();
+        InterestProtocol otherInterestProtocol = (InterestProtocol)potentialRepresentative
+                .getProtocol(protocolID);
+        if (otherInterestProtocol.getRepresentative() != null) {
+            if(getNeighbours().contains(otherInterestProtocol.getRepresentative())){
+                setRepresentative(otherInterestProtocol.getRepresentative());
+            }
+        } else {
+            setRepresentative(potentialRepresentative);
+        }
     }
 
     @Override
@@ -352,7 +381,7 @@ public class InterestProtocolImpl implements InterestProtocol {
     public Node getNeighbor(int i) {
         int j = 0;
         for (Node n : interestCommunity) {
-            if(j == i){
+            if (j == i) {
                 return n;
             }
             j++;
