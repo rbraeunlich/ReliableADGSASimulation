@@ -23,12 +23,14 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private SearchQuery searchQuery;
 
+    private SearchQuery receiveQuery;
+
     private int namingProtocolPid;
 
     private int interestGroupProtocolPid;
 
     private int linkableProtocolPid;
-    
+
     private float probabilityPk;
 
     public SearchProtocolImpl(String prefix) {
@@ -54,6 +56,12 @@ public class SearchProtocolImpl implements SearchProtocol {
         SearchProtocol searchProtocol = (SearchProtocol)neighbourWithHighestDegree.getProtocol(pid);
         searchProtocol.setSearchQuery(searchQuery);
 
+        checkResourceLocated(searchProtocol);
+
+    }
+
+    private void checkResourceLocated(SearchProtocol searchProtocol) {
+        // using similarfunction;
     }
 
     private Node findNeighbourWithHighestDegree(Linkable linkable) {
@@ -68,21 +76,15 @@ public class SearchProtocolImpl implements SearchProtocol {
         return neighbourWithHighestDegree;
     }
 
-    private void sendQueryToNeighboursWithProbability(Node node,int pid) {
+    private void sendQueryToNeighboursWithProbability(Node node, int pid) {
         Linkable linkable = (Linkable)node.getProtocol(linkableProtocolPid);
-        for(int i = 0 ; i < linkable.degree(); i++)
-        {
-            if(probabilityPk < new Random().nextFloat())
-            {
-                SearchProtocol searchProtocol = (SearchProtocol)linkable.getNeighbor(i).getProtocol(pid);
-                searchProtocol.setSearchQuery(searchQuery);
+        for (int i = 0; i < linkable.degree(); i++) {
+            if (probabilityPk < new Random().nextFloat()) {
+                SearchProtocol searchProtocol = (SearchProtocol)linkable.getNeighbor(i)
+                        .getProtocol(pid);
+                searchProtocol.receiveSearchQuery(searchQuery);
             }
         }
-    }
-    
-    boolean checkSuccessfulllySendingMessage() {
-        return false;
-
     }
 
     /**
@@ -94,6 +96,14 @@ public class SearchProtocolImpl implements SearchProtocol {
      */
     private void performBacktracking(Node node, int protocolID) {
 
+    }
+
+    /**
+     * @see kr.ac.kaist.ds.groupd.search.SearchProtocol#setSearchQuery(kr.ac.kaist.ds.groupd.search.SearchQuery)
+     */
+    @Override
+    public void receiveSearchQuery(SearchQuery q) {
+        receiveQuery = q;
     }
 
     /**

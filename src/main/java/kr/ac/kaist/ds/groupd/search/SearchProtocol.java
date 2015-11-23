@@ -10,5 +10,11 @@ public interface SearchProtocol extends CDProtocol {
 	 * @param q the search query
 	 */
 	void setSearchQuery(SearchQuery q);
+	
+	/**
+	 * RecevieSearchQuery, Receive message from another node. 
+	 * @param q
+	 */
+	void receiveSearchQuery(SearchQuery q);
 
 }
