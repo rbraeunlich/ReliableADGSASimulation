@@ -2,16 +2,13 @@
 package kr.ac.kaist.ds.groupd.search.impl;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
-import peersim.config.FastConfig;
-import peersim.core.CommonState;
+import peersim.config.Configuration;
 import peersim.core.Linkable;
 import peersim.core.Node;
-import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
-import kr.ac.kaist.ds.groupd.example.token.TokenProtocol;
-import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 
 public class SearchProtocolImpl implements SearchProtocol {
 
@@ -19,9 +16,7 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 
-    private InterestProtocol interestProtocol;
-
-    private GroupNameProtocol groupNameProtocol;
+    private static final String PAR_LINKABLE_PROTOCOL = "link";
 
     private SearchQuery searchQuery;
 
@@ -29,33 +24,37 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private ArrayList<Node> celculateForDegrees;
 
-    public SearchProtocolImpl(String name) {
-        searchQuery = new SearchQuery();
+    private int namingProtocolPid;
+
+    private int interestGroupProtocolPid;
+
+    private int linkableProtocolPid;
+
+    public SearchProtocolImpl(String prefix) {
+        this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAME_PROTOCOL);
+        this.interestGroupProtocolPid = Configuration
+                .getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
+        this.linkableProtocolPid = Configuration.getPid(prefix + "." + PAR_LINKABLE_PROTOCOL);
     }
 
     /**
      * Performs the forward search based on the ADGSA algorithm.
      */
     private void performSearch(Node node, int pid) {
-
-        long appropriateDegreePeer;
-
-        // 1~2
-        if (searchQuery.getVisitedNodes().contains(node))
-            return;
-        else
-            searchQuery.getVisitedNodes().add(node);
-
-        // 3~4 token will be change searchquery.
-        Linkable linkable = (Linkable)node.getProtocol(FastConfig.getLinkable(pid));
-
-        for (int i = 0; i < linkable.degree(); i++) {
-            celculateForDegrees.add(linkable.getNeighbor(i));
+        // target reached
+        if (searchQuery.getDestination() == node.getID()) {
+            Logger.getLogger(this.getClass().getName()).info("Target reached");
         }
+        sendQueryToNeighboursWithProbability(node);
+        Linkable linkable = (Linkable)node.getProtocol(linkableProtocolPid);
+        Node neighbourWithHighestDegree = findNeighbourWithHighestDegree(linkable);
 
+        SearchProtocol searchProtocol = (SearchProtocol)neighbourWithHighestDegree.getProtocol(pid);
+        searchProtocol.setSearchQuery(searchQuery);
         /*
          * verify that already came out path(node)
          */
+        //i'm not sure what this is supposed to do...
         for (int i = 0; i < celculateForDegrees.size(); i++) {
             for (int j = 0; j < checkForPeers.size(); j++) {
                 if (celculateForDegrees.get(i).getID() == checkForPeers.get(j)) {
@@ -66,9 +65,26 @@ public class SearchProtocolImpl implements SearchProtocol {
         }
 
         // 5~9
-        appropriateDegreePeer = degree(celculateForDegrees, pid);
 
         // 10 ~ 11
+
+    }
+
+    private Node findNeighbourWithHighestDegree(Linkable linkable) {
+        Node neighbourWithHighestDegree = linkable.getNeighbor(0);
+        for (int i = 1; i < linkable.degree(); i++) {
+            Node n = linkable.getNeighbor(i);
+            if (((Linkable)n.getProtocol(linkableProtocolPid))
+                    .degree() > ((Linkable)neighbourWithHighestDegree
+                            .getProtocol(linkableProtocolPid)).degree()) {
+                neighbourWithHighestDegree = n;
+            }
+        }
+        return neighbourWithHighestDegree;
+    }
+
+    private void sendQueryToNeighboursWithProbability(Node node) {
+        // TODO Auto-generated method stub
 
     }
 
@@ -79,26 +95,13 @@ public class SearchProtocolImpl implements SearchProtocol {
     }
 
     /**
-     * Return biggest Degree Number Id;
-     * 
-     * @param S
-     * @return
-     */
-    private long degree(ArrayList<Node> S, int pid) {
-        long result = -1;
-
-        for (int i = 0; i < S.size(); i++) {
-            Linkable linkable = (Linkable)S.get(i).getProtocol(FastConfig.getLinkable(pid));
-            result = ((linkable.degree() > result) ? linkable.degree() : result);
-        }
-        return result;
-    }
-
-    /**
      * Performs the backtracking, based on our group naming scheme. backTracking
      * follow previous steps
+     * 
+     * @param protocolID
+     * @param node
      */
-    private void performBacktracking() {
+    private void performBacktracking(Node node, int protocolID) {
 
     }
 
@@ -121,8 +124,13 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     @Override
     public void nextCycle(Node node, int protocolID) {
-        performSearch(node, protocolID);
-
+        if (searchQuery != null) {
+            if (searchQuery.isBackward()) {
+                performBacktracking(node, protocolID);
+            } else {
+                performSearch(node, protocolID);
+            }
+        }
     }
 
 }

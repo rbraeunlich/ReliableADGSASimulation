@@ -37,7 +37,17 @@ public class SearchQuery {
     public void setVisitedGroups(List<GroupName<?>> visitedGroups) {
         this.visitedGroups = visitedGroups;
     }
-	
-	
 
+    public int getSource() {
+        return source;
+    }
+
+    public int getDestination() {
+        return destination;
+    }
+
+    public boolean isBackward() {
+        return backward;
+    }
+	
 }
