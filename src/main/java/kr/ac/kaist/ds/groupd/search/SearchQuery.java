@@ -22,4 +22,22 @@ public class SearchQuery {
 	// visited groups
 	private List<GroupName<?>> visitedGroups;
 
+    public List<Node> getVisitedNodes() {
+        return visitedNodes;
+    }
+
+    public void setVisitedNodes(List<Node> visitedNodes) {
+        this.visitedNodes = visitedNodes;
+    }
+
+    public List<GroupName<?>> getVisitedGroups() {
+        return visitedGroups;
+    }
+
+    public void setVisitedGroups(List<GroupName<?>> visitedGroups) {
+        this.visitedGroups = visitedGroups;
+    }
+	
+	
+
 }

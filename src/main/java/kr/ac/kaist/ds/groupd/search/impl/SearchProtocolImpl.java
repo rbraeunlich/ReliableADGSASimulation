@@ -29,17 +29,8 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private ArrayList<Node> celculateForDegrees;
 
-    private boolean token;
-
     public SearchProtocolImpl(String name) {
-    }
-
-    public boolean hasToken() {
-        return token;
-    }
-
-    public void resetToken() {
-        this.token = false;
+        searchQuery = new SearchQuery();
     }
 
     /**
@@ -47,70 +38,58 @@ public class SearchProtocolImpl implements SearchProtocol {
      */
     private void performSearch(Node node, int pid) {
 
-        long Pm;
+        long appropriateDegreePeer;
 
         // 1~2
-        if (checkForPeers.contains(node.getID()))
+        if (searchQuery.getVisitedNodes().contains(node))
             return;
         else
-            checkForPeers.add(node.getID());
+            searchQuery.getVisitedNodes().add(node);
 
-        // 3~4 token will be change other.
-        if (true == token) {
+        // 3~4 token will be change searchquery.
+        Linkable linkable = (Linkable)node.getProtocol(FastConfig.getLinkable(pid));
 
-            Linkable linkable = (Linkable)node.getProtocol(FastConfig.getLinkable(pid));
-
-            for (int i = 0; i < linkable.degree(); i++) {
-                Node neighbor = linkable.getNeighbor(i);
-                TokenProtocol protocol = (TokenProtocol)neighbor.getProtocol(pid);
-                protocol.setToken(true);
-                celculateForDegrees.add(linkable.getNeighbor(i));
-            }
-
-            /*
-             * verify that already came out path(node)
-             */
-            for (int i = 0; i < celculateForDegrees.size(); i++) {
-                for (int j = 0; j < checkForPeers.size(); j++) {
-                    if (celculateForDegrees.get(i).getID() == checkForPeers.get(j)) {
-                        celculateForDegrees.remove(i);
-                        continue;
-                    }
-                }
-            }
-            
-            //5~9
-            Pm = Degree(celculateForDegrees,pid);
-            
-            //10 ~ 11
-            
-            
-
+        for (int i = 0; i < linkable.degree(); i++) {
+            celculateForDegrees.add(linkable.getNeighbor(i));
         }
 
+        /*
+         * verify that already came out path(node)
+         */
+        for (int i = 0; i < celculateForDegrees.size(); i++) {
+            for (int j = 0; j < checkForPeers.size(); j++) {
+                if (celculateForDegrees.get(i).getID() == checkForPeers.get(j)) {
+                    celculateForDegrees.remove(i);
+                    continue;
+                }
+            }
+        }
+
+        // 5~9
+        appropriateDegreePeer = degree(celculateForDegrees, pid);
+
+        // 10 ~ 11
+
     }
-    
+
     // implement after
-    boolean checkSuccessfulllySendingMessage()
-    {
+    boolean checkSuccessfulllySendingMessage() {
         return false;
-        
+
     }
-    
-    
+
     /**
      * Return biggest Degree Number Id;
+     * 
      * @param S
      * @return
      */
-    private long Degree(ArrayList<Node> S, int pid)
-    {
+    private long degree(ArrayList<Node> S, int pid) {
         long result = -1;
-        
-        for(int i = 0 ; i <S.size() ; i++)
-        {
+
+        for (int i = 0; i < S.size(); i++) {
             Linkable linkable = (Linkable)S.get(i).getProtocol(FastConfig.getLinkable(pid));
-             result=((linkable.degree()> result )? linkable.degree(): result) ;
+            result = ((linkable.degree() > result) ? linkable.degree() : result);
         }
         return result;
     }
