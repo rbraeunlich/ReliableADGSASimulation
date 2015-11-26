@@ -9,9 +9,9 @@ import peersim.config.Configuration;
 import peersim.core.Network;
 import peersim.core.Node;
 
-public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
+public class StaticGroupNameProtocol implements GroupNameProtocol {
 
-	private GroupName<String> groupName;
+	private GroupName  groupName;
 
 	private int interestProtocolPid;
 
@@ -23,17 +23,17 @@ public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
 	}
 
 	@Override
-	public boolean compareWithGroupName(GroupName<String> otherName) {
+	public boolean compareWithGroupName(GroupName  otherName) {
 		return otherName.equals(groupName);
 	}
 
 	@Override
-	public GroupName<String> getGroupName() {
+	public GroupName  getGroupName() {
 		return groupName;
 	}
 
 	@Override
-	public GroupName<String> createGroupName() {
+	public GroupName  createGroupName() {
 		if(this.groupName != null){
 			return groupName;
 		}
@@ -72,7 +72,7 @@ public class StaticGroupNameProtocol implements GroupNameProtocol<String> {
 	}
 	
     @Override
-    public void setGroupName(GroupName<String> groupName) {
+    public void setGroupName(GroupName groupName) {
         this.groupName = groupName;
     }
 }

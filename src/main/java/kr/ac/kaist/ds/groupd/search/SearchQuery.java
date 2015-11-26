@@ -24,7 +24,7 @@ public class SearchQuery {
 
 	private List<Node> visitedNodes;
 
-	private Set<GroupName<?>> visitedGroups;
+	private Set<GroupName> visitedGroups;
 	
 	/**
 	 * Nodes that did not get a message due to the probability will be marked as "orange".
@@ -64,11 +64,11 @@ public class SearchQuery {
         this.visitedNodes = visitedNodes;
     }
 
-    public Set<GroupName<?>> getVisitedGroups() {
+    public Set<GroupName> getVisitedGroups() {
         return visitedGroups;
     }
 
-    public void setVisitedGroups(Set<GroupName<?>> visitedGroups) {
+    public void setVisitedGroups(Set<GroupName> visitedGroups) {
         this.visitedGroups = visitedGroups;
     }
 

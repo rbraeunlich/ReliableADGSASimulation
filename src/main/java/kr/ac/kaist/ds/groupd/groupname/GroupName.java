@@ -5,7 +5,7 @@ package kr.ac.kaist.ds.groupd.groupname;
  * representation of the name.
  *
  */
-public interface GroupName<T> {
+public interface GroupName {
 
-	T getName();
+	String getName();
 }

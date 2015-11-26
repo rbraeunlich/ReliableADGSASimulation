@@ -2,7 +2,7 @@ package kr.ac.kaist.ds.groupd.groupname.impl;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 
-public class StaticGroupName implements GroupName<String> {
+public class StaticGroupName implements GroupName {
 
 	private String macAddress;
 	private Long timestamp;

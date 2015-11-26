@@ -17,6 +17,7 @@ import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import peersim.config.Configuration;
 import peersim.core.Linkable;
 import peersim.core.Node;
+import peersim.graph.NeighbourListGraph;
 
 public class InterestProtocolImpl implements InterestProtocol {
 
@@ -162,18 +163,18 @@ public class InterestProtocolImpl implements InterestProtocol {
             startCommunityFormation(node, protocolID);
             startElection = false;
             if (this.getRepresentative().equals(node)) {
-                GroupNameProtocol<?> namingProtocol = (GroupNameProtocol<?>)node
+                GroupNameProtocol namingProtocol = (GroupNameProtocol) node
                         .getProtocol(namingProtocolPid);
                 createAndSetGroupName(namingProtocol);
             }
         }
     }
 
-    private <T> void createAndSetGroupName(GroupNameProtocol<T> namingProtocol) {
-        GroupName<T> groupName = namingProtocol.createGroupName();
+    private void createAndSetGroupName(GroupNameProtocol namingProtocol) {
+        GroupName groupName = namingProtocol.createGroupName();
         for (Node n : getNeighbours()) {
             @SuppressWarnings("unchecked")
-            GroupNameProtocol<T> namingProtocolOther = (GroupNameProtocol<T>)n
+            GroupNameProtocol namingProtocolOther = (GroupNameProtocol)n
                     .getProtocol(namingProtocolPid);
             namingProtocolOther.setGroupName(groupName);
         }
@@ -406,4 +407,6 @@ public class InterestProtocolImpl implements InterestProtocol {
     @Override
     public void onKill() {
     }
+
+   
 }

@@ -10,7 +10,7 @@ import peersim.cdsim.CDProtocol;
  * @param <S>
  *            the actual type how the name is formed.
  */
-public interface GroupNameProtocol<T> extends CDProtocol {
+public interface GroupNameProtocol extends CDProtocol {
 
 	static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 	/**
@@ -19,14 +19,14 @@ public interface GroupNameProtocol<T> extends CDProtocol {
 	 * @param otherName
 	 * @return
 	 */
-	boolean compareWithGroupName(GroupName<T> otherName);
+	boolean compareWithGroupName(GroupName otherName);
 
-	GroupName<T> getGroupName();
+	GroupName getGroupName();
 	
 	/**
 	 * Forms a group names, saves it itself (replacing the existing one) and returns it.
 	 */
-	GroupName<T> createGroupName();
+	GroupName createGroupName();
 	
-	void setGroupName(GroupName<T> groupName);
+	void setGroupName(GroupName groupName);
 }

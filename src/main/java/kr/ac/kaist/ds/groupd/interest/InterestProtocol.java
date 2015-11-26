@@ -3,6 +3,7 @@ package kr.ac.kaist.ds.groupd.interest;
 
 import java.util.Set;
 
+import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
 import peersim.cdsim.CDProtocol;
 import peersim.core.Linkable;

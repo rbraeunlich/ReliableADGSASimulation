@@ -12,7 +12,7 @@ import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 
-public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
+public class DynamicGroupNameProtocol implements GroupNameProtocol{
 
     private static final String PAR_BITS_USED = "bits";
 
@@ -26,7 +26,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
 
     private long nodeId;
 
-    private GroupName<String> groupName;
+    private GroupName groupName;
 
     public DynamicGroupNameProtocol(String prefix) {
         this.interestProtocolPid = Configuration.getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
@@ -40,7 +40,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
     }
 
     @Override
-    public boolean compareWithGroupName(GroupName<String> otherName) {
+    public boolean compareWithGroupName(GroupName otherName) {
         String other = otherName.getName();
         String thisName = this.groupName.getName();
         int difference = other.length() - thisName.length();
@@ -83,12 +83,12 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
     }
 
     @Override
-    public GroupName<String> getGroupName() {
+    public GroupName getGroupName() {
         return groupName;
     }
 
     @Override
-    public GroupName<String> createGroupName() {
+    public GroupName createGroupName() {
         Node node = findNode();
         InterestProtocolImpl interestProtocol = (InterestProtocolImpl)node
                 .getProtocol(interestProtocolPid);
@@ -132,7 +132,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol<String> {
     }
 
     @Override
-    public void setGroupName(GroupName<String> groupName) {
+    public void setGroupName(GroupName groupName) {
         this.groupName = groupName;
     }
 }
