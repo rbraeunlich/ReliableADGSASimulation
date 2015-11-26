@@ -4,7 +4,10 @@ package kr.ac.kaist.ds.groupd.managing;
 import java.util.Date;
 import java.util.Random;
 
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
+import kr.ac.kaist.ds.groupd.search.SearchProtocol;
+import kr.ac.kaist.ds.groupd.search.SearchQuery;
 import kr.ac.kaist.ds.groupd.topology.InterestInitializer;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -20,6 +23,7 @@ public class Manager implements Control {
     private static final String PAR_TIME_RANGE_END_MS = "end";
 
     private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
+    private static final String PAR_SEARCH_PROTOCOL = "search";
 
     private static final String PAR_INIT = "init";
 
@@ -36,11 +40,16 @@ public class Manager implements Control {
     private Long interval;
 
     private NodeInitializer[] inits;
+    
+    private boolean searchStarted = false;
+
+    private int searchProtocolPid;
 
     public Manager(String prefix) {
         this.startRangeMs = Configuration.getLong(prefix + "." + PAR_TIME_RANGE_START_MS);
         this.endRangeMs = Configuration.getLong(prefix + "." + PAR_TIME_RANGE_END_MS);
         this.interestGroupPid = Configuration.getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
+        this.searchProtocolPid = Configuration.getPid(prefix + "." + PAR_SEARCH_PROTOCOL);
         this.rand = new Random();
         Object[] tmp = Configuration.getInstanceArray(prefix + "." + PAR_INIT);
         inits = new NodeInitializer[tmp.length];
@@ -103,6 +112,14 @@ public class Manager implements Control {
         if (new Date().getTime() - startTime.getTime() >= interval) {
             interval = null;
             changeNetwork();
+        }
+        if(!searchStarted){
+            Random random = new Random();
+            int destination = random.nextInt(6040);
+            int source = random.nextInt(6040);
+            Node node = Network.get(destination);
+            SearchProtocol protocol = (SearchProtocol)node.getProtocol(searchProtocolPid);
+            protocol.setSearchQuery(new SearchQuery(source, destination));
         }
         return false;
     }

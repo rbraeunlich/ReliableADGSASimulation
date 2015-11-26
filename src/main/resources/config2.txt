@@ -18,6 +18,11 @@ protocol.interest.candVotes 5
 protocol.interest.repThreshold 1
 protocol.interest.naming name
 
+protocol.search kr.ac.kaist.ds.groupd.search.impl.SearchProtocolImpl
+protocol.search.naming name
+protocol.search.interestgroup interest
+protocol.search.link link
+
 ################### initialization ======================
 
 init.0 InterestInitializer
@@ -37,6 +42,7 @@ control.degree.undir
 control.degree.method list
 
 control.0 kr.ac.kaist.ds.groupd.managing.Manager
+control.0.search search
 control.0.start 4
 control.0.end 9000
 control.0.interestgroup interest

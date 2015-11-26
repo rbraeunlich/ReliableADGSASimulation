@@ -3,6 +3,7 @@ package kr.ac.kaist.ds.groupd.interest;
 
 import java.util.Set;
 
+import kr.ac.kaist.ds.groupd.search.SearchQuery;
 import peersim.cdsim.CDProtocol;
 import peersim.core.Linkable;
 import peersim.core.Node;
@@ -39,4 +40,5 @@ public interface InterestProtocol extends CDProtocol, Linkable {
     boolean removeNeighbour(Node toRemove);
 
     void resetVotes();
+
 }
