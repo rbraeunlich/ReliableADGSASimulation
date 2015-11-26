@@ -26,7 +26,7 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 
-    private static final String PAR_LINKABLE_PROTOCOL = "link";
+    private static final String PAR_GOSSIP_PROBABILITY = "prob";
 
     private SearchQuery searchQuery;
 
@@ -34,16 +34,13 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private int interestGroupProtocolPid;
 
-    private int linkableProtocolPid;
-
-    private float probabilityPk;
+    private double probabilityPk;
 
     public SearchProtocolImpl(String prefix) {
         this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAME_PROTOCOL);
         this.interestGroupProtocolPid = Configuration
                 .getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
-        this.linkableProtocolPid = Configuration.getPid(prefix + "." + PAR_LINKABLE_PROTOCOL);
-        this.probabilityPk = 0.6f;
+        this.probabilityPk = Configuration.getDouble(prefix + "." + PAR_GOSSIP_PROBABILITY);
     }
 
     /**

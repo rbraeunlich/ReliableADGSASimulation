@@ -1,4 +1,4 @@
-simulation.cycles 100
+simulation.cycles 2
 #the number of users in the movielens 1 mio. dataset
 network.size 6040
 
@@ -21,7 +21,7 @@ protocol.interest.naming name
 protocol.search kr.ac.kaist.ds.groupd.search.impl.SearchProtocolImpl
 protocol.search.naming name
 protocol.search.interestgroup interest
-protocol.search.link link
+protocol.search.prob 0.6
 
 ################### initialization ======================
 
@@ -52,4 +52,10 @@ control.0.init.0.k 150
 control.0.init.0.protocol link
 control.0.init.0.undir
 
-include.control degree 0
+#control.1 peersim.reports.GraphPrinter
+#control.1.protocol interest
+#control.1.format gml
+#control.1.outf D:\workspace\DS_workspace\ReliableADGSASimulation\TEST
+
+
+include.control degree 0 #1
