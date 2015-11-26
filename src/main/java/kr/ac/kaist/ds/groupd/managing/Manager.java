@@ -117,7 +117,7 @@ public class Manager implements Control {
             Random random = new Random();
             int destination = random.nextInt(6040);
             int source = random.nextInt(6040);
-            Node node = Network.get(destination);
+            Node node = Network.get(source);
             SearchProtocol protocol = (SearchProtocol)node.getProtocol(searchProtocolPid);
             protocol.setSearchQuery(new SearchQuery(source, destination));
         }
