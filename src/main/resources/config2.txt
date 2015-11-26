@@ -1,7 +1,8 @@
-simulation.cycles 100
+simulation.cycles 20
 #the number of users in the movielens 1 mio. dataset
 network.size 6040
 
+default.connections 15
 ################### protocols ===========================
 
 protocol.link IdleProtocol
@@ -13,7 +14,7 @@ protocol.name.interestgroup interest
 
 protocol.interest kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl
 protocol.interest.linkable link
-protocol.interest.coeff 0.6
+protocol.interest.coeff 0.5
 protocol.interest.candVotes 5
 protocol.interest.repThreshold 1
 protocol.interest.naming name
@@ -21,8 +22,8 @@ protocol.interest.naming name
 protocol.search kr.ac.kaist.ds.groupd.search.impl.SearchProtocolImpl
 protocol.search.naming name
 protocol.search.interestgroup interest
-protocol.search.prob 0.2
-protocol.search.query.ttl 5
+protocol.search.prob 0.1
+protocol.search.query.ttl 20
 
 ################### initialization ======================
 
@@ -32,7 +33,7 @@ init.0.protocol interest
 init.rnd WireKOut
 init.rnd.protocol link
 # degree of nodes
-init.rnd.k 150
+init.rnd.k default.connections
 init.rnd.undir
 
 ################ control ==============================
@@ -49,7 +50,7 @@ control.0.end 9000
 control.0.interestgroup interest
 #the new nodes are connected with existing nodes based on RandNI. WireKOut does not work
 control.0.init.0 RandNI
-control.0.init.0.k 150
+control.0.init.0.k default.connections
 control.0.init.0.protocol link
 control.0.init.0.undir
 
@@ -59,4 +60,4 @@ control.0.init.0.undir
 #control.1.outf D:\workspace\DS_workspace\ReliableADGSASimulation\TEST
 
 
-include.control degree 0 #1
+include.control 0 degree #1 

@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -29,7 +27,7 @@ public class SearchProtocolImpl implements SearchProtocol {
     private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
 
     private static final String PAR_GOSSIP_PROBABILITY = "prob";
-    
+
     private static final String PAR_QUERY_TTL = "query.ttl";
 
     private Collection<SearchQuery> searchQueries = new ArrayList<>();
@@ -41,7 +39,7 @@ public class SearchProtocolImpl implements SearchProtocol {
     private double probabilityPk;
 
     private int quertyTtl;
-    
+
     public SearchProtocolImpl(String prefix) {
         this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAME_PROTOCOL);
         this.interestGroupProtocolPid = Configuration
@@ -59,7 +57,7 @@ public class SearchProtocolImpl implements SearchProtocol {
         // target reached return the start source.
         if (isDestinationReached(node, searchQuery)) {
             searchQuery.setBackward(true);
-            //put it back in, because we removed it
+            // put it back in, because we removed it
             this.searchQueries.add(searchQuery);
             Logger.getLogger(getClass().getName()).info("Destination found");
             return;
@@ -86,7 +84,8 @@ public class SearchProtocolImpl implements SearchProtocol {
             if (hasNodeAlreadyBeenVisited(neighbourWithSecondHighestDegree, searchQuery)) {
                 sendQueryToPredecessor(node, pid, searchQuery);
             } else {
-                sendQueryToSecondDegreeNeighbour(node, pid, neighbourWithSecondHighestDegree, searchQuery);
+                sendQueryToSecondDegreeNeighbour(node, pid, neighbourWithSecondHighestDegree,
+                        searchQuery);
             }
         }
     }
@@ -120,39 +119,41 @@ public class SearchProtocolImpl implements SearchProtocol {
     }
 
     private Node findNeighbourWithHighestDegree(Node node, int pid) {
-        InterestProtocol interestProtocol = (InterestProtocol)node
-                .getProtocol(interestGroupProtocolPid);
-        Map<Node, Integer> neighboursWithDegree = interestProtocol.getNeighbours().stream().collect(
-                Collectors.toMap(n -> n, n -> getInterestProtocolFrom(n).getNeighbours().size()));
-        Entry<Node, Integer> neighbourWithHighestDegree = null;
-        for (Entry<Node, Integer> entry : neighboursWithDegree.entrySet()) {
+        InterestProtocol interestProtocol = getInterestProtocolFrom(node);
+        Node neighbourWithHighestDegree = null;
+        int degreeOfNeighbourWithHighestDegree = 0;
+        for (Node neighbour : interestProtocol.getNeighbours()) {
+            int degreeFrom = getDegreeFrom(neighbour);
             if (neighbourWithHighestDegree == null
-                    || entry.getValue() > neighbourWithHighestDegree.getValue()) {
-                neighbourWithHighestDegree = entry;
+                    || degreeFrom > degreeOfNeighbourWithHighestDegree) {
+                neighbourWithHighestDegree = neighbour;
+                degreeOfNeighbourWithHighestDegree = degreeFrom;
             }
+
         }
-        return neighbourWithHighestDegree.getKey();
+        return neighbourWithHighestDegree;
     }
 
-    @SuppressWarnings("unused")
+    private int getDegreeFrom(Node n) {
+        return getInterestProtocolFrom(n).getNeighbours().size();
+    }
+
     private Node findNeighbourWithSecondHighestDegree(Node node, int pid) {
+        Node neighbourWithHighestDegree = null;
+        Node neighbourWithSecondHighestDegree = null;
+        int degreeOfNeighbourWithHighestDegree = 0;
         InterestProtocol interestProtocol = (InterestProtocol)node.getProtocol(pid);
-        Map<Node, Integer> neighboursWithDegree = interestProtocol.getNeighbours().stream()
-                .collect(Collectors.toMap(n -> n,
-                        n -> ((InterestProtocol)n.getProtocol(pid)).getNeighbours().size()));
-        Entry<Node, Integer> neighbourWithHighestDegree = null;
-        Entry<Node, Integer> neighbourWithSecondHighestDegree = null;
-        for (Entry<Node, Integer> entry : neighboursWithDegree.entrySet()) {
+        for (Node neighbour : interestProtocol.getNeighbours()) {
+            int degreeFrom = getDegreeFrom(neighbour);
             if (neighbourWithHighestDegree == null
-                    || entry.getValue() > neighbourWithHighestDegree.getValue()) {
+                    || degreeFrom > degreeOfNeighbourWithHighestDegree) {
                 neighbourWithSecondHighestDegree = neighbourWithHighestDegree;
-                neighbourWithHighestDegree = entry;
+                neighbourWithHighestDegree = neighbour;
+                degreeOfNeighbourWithHighestDegree = degreeFrom;
             }
+
         }
-        if (neighbourWithSecondHighestDegree == null) {
-            return null;
-        }
-        return neighbourWithSecondHighestDegree.getKey();
+        return neighbourWithSecondHighestDegree;
     }
 
     /**
@@ -163,15 +164,16 @@ public class SearchProtocolImpl implements SearchProtocol {
      * 
      * @param node
      * @param pid
-     * @param searchQuery 
+     * @param searchQuery
      * @return
      */
-    private List<Node> sendQueryToNeighboursWithProbability(Node node, int pid, SearchQuery searchQuery) {
+    private List<Node> sendQueryToNeighboursWithProbability(Node node, int pid,
+            SearchQuery searchQuery) {
         InterestProtocol interstProtocol = (InterestProtocol)node
                 .getProtocol(interestGroupProtocolPid);
         Random random = new Random();
         List<Node> nodesToReceiveSearchQuery = interstProtocol.getNeighbours().stream()
-                .filter(n -> probabilityPk < random.nextFloat()).collect(Collectors.toList());
+                .filter(n -> probabilityPk > random.nextFloat()).collect(Collectors.toList());
 
         ArrayList<Node> nodesToLabelOrange = new ArrayList<>(interstProtocol.getNeighbours());
         nodesToLabelOrange.removeAll(nodesToReceiveSearchQuery);
@@ -191,10 +193,11 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @param node
      * @param pid
      * @param nodesToLabelOrange
-     * @param searchQuery 
+     * @param searchQuery
      * @return
      */
-    private SearchQuery copySearchQuery(Node node, int pid, List<Node> nodesToLabelOrange, SearchQuery searchQuery) {
+    private SearchQuery copySearchQuery(Node node, int pid, List<Node> nodesToLabelOrange,
+            SearchQuery searchQuery) {
         SearchQuery q = new SearchQuery(searchQuery);
         q.addVisitedNode(node);
         q.addVisitedGroup(getGroupNameProtocolFrom(node).getGroupName());
@@ -213,9 +216,9 @@ public class SearchProtocolImpl implements SearchProtocol {
     private void performBacktracking(Node node, int protocolID, SearchQuery searchQuery) {
         if (node.getID() == searchQuery.getSource()) {
             Logger.getLogger(this.getClass().getName()).info("back home!");
+            return;
         }
-        Node lastNode = searchQuery.getVisitedNodes()
-                .get(searchQuery.getVisitedNodes().size() - 1);
+        Node lastNode = searchQuery.getVisitedNodes().get(searchQuery.getVisitedNodes().size() - 1);
         InterestProtocol interestProtcol = getInterestProtocolFrom(node);
         if (interestProtcol.getNeighbours().contains(lastNode)) {
             sendQueryToLastNode(node, protocolID, lastNode, searchQuery);
@@ -223,7 +226,8 @@ public class SearchProtocolImpl implements SearchProtocol {
         }
         Node representative = getInterestProtocolFrom(node).getRepresentative();
         if (node.equals(representative)) {
-            boolean sent = sendQueryToNeighborIfItIsInVisitedList(protocolID, representative, searchQuery);
+            boolean sent = sendQueryToNeighborIfItIsInVisitedList(protocolID, representative,
+                    searchQuery);
             if (sent) {
                 return;
             }
@@ -273,8 +277,8 @@ public class SearchProtocolImpl implements SearchProtocol {
         return (InterestProtocol)node.getProtocol(interestGroupProtocolPid);
     }
 
-    private boolean tryToSendQueryToNeighboursNeighbours(int protocolID, Collection<Node> neighbours,
-            GroupName lastNodeGroupName, SearchQuery searchQuery) {
+    private boolean tryToSendQueryToNeighboursNeighbours(int protocolID,
+            Collection<Node> neighbours, GroupName lastNodeGroupName, SearchQuery searchQuery) {
         Optional<Node> neighboursNeighbourInCorrectGroup = neighbours.stream()
                 .flatMap(n -> getInterestProtocolFrom(n).getNeighbours().stream())
                 .filter(nn -> getGroupNameProtocolFrom(nn).compareWithGroupName(lastNodeGroupName))
@@ -287,8 +291,8 @@ public class SearchProtocolImpl implements SearchProtocol {
         return false;
     }
 
-    private boolean sendQueryToNeighbourInGroupInVisitedList(int protocolID, Collection<Node> neighbours,
-            GroupName groupName, SearchQuery searchQuery) {
+    private boolean sendQueryToNeighbourInGroupInVisitedList(int protocolID,
+            Collection<Node> neighbours, GroupName groupName, SearchQuery searchQuery) {
         Optional<Node> nodeInBacktrackGroup = neighbours.stream()
                 .filter(n -> getGroupNameProtocolFrom(n).compareWithGroupName(groupName)).findAny();
         if (nodeInBacktrackGroup.isPresent()) {
@@ -299,7 +303,8 @@ public class SearchProtocolImpl implements SearchProtocol {
         return true;
     }
 
-    private boolean sendQueryToNeighborIfItIsInVisitedList(int protocolID, Node representative, SearchQuery searchQuery) {
+    private boolean sendQueryToNeighborIfItIsInVisitedList(int protocolID, Node representative,
+            SearchQuery searchQuery) {
         Collection<Node> neighbours = getInterestProtocolFrom(representative).getNeighbours();
         for (Node n : neighbours) {
             if (searchQuery.getVisitedNodes().contains(n)) {
@@ -320,9 +325,10 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @param node
      * @param protocolID
      * @param lastNode
-     * @param searchQuery 
+     * @param searchQuery
      */
-    private void sendQueryToLastNode(Node node, int protocolID, Node lastNode, SearchQuery searchQuery) {
+    private void sendQueryToLastNode(Node node, int protocolID, Node lastNode,
+            SearchQuery searchQuery) {
         searchQuery.getVisitedNodes().remove(lastNode);
         Set<GroupName> visitedGroups = searchQuery.getVisitedGroups();
         visitedGroups.remove(getGroupNameProtocolFrom(node).getGroupName());
@@ -350,13 +356,14 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     @Override
     public void nextCycle(Node node, int protocolID) {
-        for (SearchQuery searchQuery : new ArrayList<>(searchQueries)) {
-            if(searchQuery.hasBeenMovedThisRound()){
+        ArrayList<SearchQuery> copyQueries = new ArrayList<>(searchQueries);
+        for (SearchQuery searchQuery : copyQueries) {
+            if (searchQuery.hasBeenMovedThisRound()) {
                 continue;
             }
             searchQueries.remove(searchQuery);
             searchQuery.movedThisRound();
-            if(isTimeOver(searchQuery)){
+            if (isTimeOver(searchQuery)) {
                 continue;
             }
             if (searchQuery.isBackward()) {
