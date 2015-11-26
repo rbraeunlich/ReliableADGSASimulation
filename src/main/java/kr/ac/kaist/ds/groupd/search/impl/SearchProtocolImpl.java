@@ -13,13 +13,11 @@ import java.util.stream.Collectors;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
-import kr.ac.kaist.ds.groupd.groupname.impl.DynamicGroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
 import peersim.config.Configuration;
 import peersim.core.Node;
-import peersim.core.Protocol;
 
 public class SearchProtocolImpl implements SearchProtocol {
 
@@ -227,13 +225,25 @@ public class SearchProtocolImpl implements SearchProtocol {
             Set<Node> neighbours = ((InterestProtocol)representative
                     .getProtocol(interestGroupProtocolPid)).getNeighbours();
             // no neighbour in the visited list found, gotta check the groups
-            GroupName groupName = ((GroupNameProtocol)lastNode.getProtocol(namingProtocolPid))
+            GroupName lastNodeGroupName = ((GroupNameProtocol)lastNode.getProtocol(namingProtocolPid))
                     .getGroupName();
-            boolean sentToGroup = sendQueryToNeighbourInGroup(protocolID, neighbours, groupName);
+            boolean sentToGroup = sendQueryToNeighbourInGroup(protocolID, neighbours, lastNodeGroupName);
             if(sentToGroup){
                 return;
             }
             // no group visible from here, gotta check the groups of my neighbours neighbours
+            for (Node n : neighbours) {
+                Set<Node> neighboursNeighbours = ((InterestProtocol) n.getProtocol(interestGroupProtocolPid)).getNeighbours();
+                for (Node nn : neighboursNeighbours) {
+                    boolean sameGroup = ((GroupNameProtocol) nn.getProtocol(namingProtocolPid)).compareWithGroupName(lastNodeGroupName);
+                    if(sameGroup){
+                        ((SearchProtocol)nn.getProtocol(protocolID)).setSearchQuery(searchQuery);
+                        this.searchQuery = null;
+                        return;
+                    }
+                }
+            }
+            // worst case go back to gossiping until we are back on track
         } else {
             //send query to representative because we do not know where to send it
             ((SearchProtocol)representative.getProtocol(protocolID)).setSearchQuery(searchQuery);
