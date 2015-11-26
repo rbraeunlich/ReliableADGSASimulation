@@ -1,9 +1,11 @@
 
 package kr.ac.kaist.ds.groupd.managing;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Random;
 
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
@@ -82,6 +84,7 @@ public class Manager implements Control {
         Node removedNode = (Node)Network.remove(CommonState.r.nextInt(Network.size()));
         InterestProtocolImpl oldNodeInterestGroupProtocol = (InterestProtocolImpl)removedNode
                 .getProtocol(interestGroupPid);
+        removeNodeFromAllOldNeigbours(removedNode, oldNodeInterestGroupProtocol);
         Node newnode = (Node)Network.prototype.clone();
         InterestProtocolImpl newNodeInterestGroupProtocol = (InterestProtocolImpl)newnode
                 .getProtocol(interestGroupPid);
@@ -95,6 +98,17 @@ public class Manager implements Control {
         }
         Network.add(newnode);
         return newnode;
+    }
+
+    /**
+     * Since the similarity is commutative, we do not need to check all nodes in the network
+     */
+    private void removeNodeFromAllOldNeigbours(Node removedNode,
+            InterestProtocolImpl oldNodeInterestGroupProtocol) {
+        Collection<Node> neighbours = oldNodeInterestGroupProtocol.getNeighbours();
+        neighbours.stream()
+            .map(n -> (InterestProtocol)n.getProtocol(interestGroupPid))
+            .forEach(p -> p.removeNeighbour(removedNode));
     }
 
     /**
@@ -118,7 +132,8 @@ public class Manager implements Control {
             int source = random.nextInt(6040);
             Node node = Network.get(source);
             SearchProtocol protocol = (SearchProtocol)node.getProtocol(searchProtocolPid);
-            protocol.setSearchQuery(new SearchQuery(source, destination));
+            protocol.addSearchQuery(new SearchQuery(source, destination, CommonState.getIntTime()));
+            searchStarted = true;
         }
         return false;
     }

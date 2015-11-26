@@ -1,4 +1,4 @@
-simulation.cycles 2
+simulation.cycles 100
 #the number of users in the movielens 1 mio. dataset
 network.size 6040
 
@@ -21,7 +21,8 @@ protocol.interest.naming name
 protocol.search kr.ac.kaist.ds.groupd.search.impl.SearchProtocolImpl
 protocol.search.naming name
 protocol.search.interestgroup interest
-protocol.search.prob 0.6
+protocol.search.prob 0.2
+protocol.search.query.ttl 5
 
 ################### initialization ======================
 

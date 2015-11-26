@@ -1,6 +1,7 @@
 
 package kr.ac.kaist.ds.groupd.interest;
 
+import java.util.Collection;
 import java.util.Set;
 
 import peersim.cdsim.CDProtocol;
@@ -19,7 +20,7 @@ public interface InterestProtocol extends CDProtocol, Linkable {
      * Return the list of neighbours this node is connected to, based on similar
      * interests.
      */
-    Set<Node> getNeighbours();
+    Collection<Node> getNeighbours();
 
     /**
      * Returns the representative of this node. It could be the node itself if

@@ -3,12 +3,12 @@ package kr.ac.kaist.ds.groupd.interest.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
@@ -30,7 +30,7 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     private static final String PAR_NAMING_PROTOCOL = "naming";
 
-    private Set<Node> interestCommunity = new LinkedHashSet<Node>();
+    private List<Node> interestCommunity = new ArrayList<Node>();
 
     private int candidateVotes = 0;
 
@@ -70,7 +70,7 @@ public class InterestProtocolImpl implements InterestProtocol {
     public Object clone() {
         try {
             InterestProtocolImpl clone = (InterestProtocolImpl)super.clone();
-            clone.interestCommunity = new LinkedHashSet<Node>();
+            clone.interestCommunity = new ArrayList<Node>();
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -260,7 +260,7 @@ public class InterestProtocolImpl implements InterestProtocol {
      * @param node
      */
     private void candidateSelectionAndVote(Node node, int protocolID) {
-        TreeMap<Node, Double> votings = new TreeMap<Node, Double>();
+        Map<Node, Double> votings = new HashMap<Node, Double>();
         for (Node neighbour : getNeighbours()) {
             double similarity = calculateSimilarity(node, neighbour, protocolID);
             votings.put(new ComparableNode(neighbour), similarity);
@@ -357,13 +357,13 @@ public class InterestProtocolImpl implements InterestProtocol {
     }
 
     @Override
-    public Set<Node> getNeighbours() {
-        return interestCommunity;
+    public Collection<Node> getNeighbours() {
+        return Collections.unmodifiableList(interestCommunity);
     }
 
     @Override
     public void setNeighbours(Set<Node> neighbours) {
-        this.interestCommunity = neighbours;
+        this.interestCommunity = new ArrayList<>(neighbours);
     }
 
     @Override
@@ -384,18 +384,14 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     @Override
     public Node getNeighbor(int i) {
-        int j = 0;
-        for (Node n : interestCommunity) {
-            if (j == i) {
-                return n;
-            }
-            j++;
-        }
-        return null;
+        return interestCommunity.get(i);
     }
 
     @Override
     public boolean addNeighbor(Node neighbour) {
+        if(interestCommunity.contains(neighbour)){
+            return false;
+        }
         return interestCommunity.add(neighbour);
     }
 

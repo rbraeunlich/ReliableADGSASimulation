@@ -1,3 +1,4 @@
+
 package kr.ac.kaist.ds.groupd.search;
 
 import java.util.ArrayList;
@@ -9,51 +10,64 @@ import java.util.Map;
 import java.util.Set;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
+import peersim.core.CommonState;
 import peersim.core.Node;
 
 public class SearchQuery {
 
     // start node
-	private final int source;
+    private final int source;
 
-	// destination node
-	private final int destination;
+    // destination node
+    private final int destination;
 
-	// backstep
-	private boolean backward;
+    /**
+     * The round in which the search message was created
+     */
+    private final int creationRound;
 
-	private List<Node> visitedNodes;
+    // backstep
+    private boolean backward;
 
-	private Set<GroupName> visitedGroups;
-	
-	/**
-	 * Nodes that did not get a message due to the probability will be marked as "orange".
-	 * If the searched for node lies not on the direct, highest-degree path and we have to 
-	 * start performing backtracking, we gotta visit those orange nodes again, so we can be 
-	 * sure that we visit all nodes.
-	 */
-	private Map<Long, Collection<Node>> orangeNodes;
-		
-	/**
-	 * Copy constructor
-	 * @param q
-	 */
-	public SearchQuery(SearchQuery q) {
-	    this.source = q.source;
-	    this.destination = q.destination;
-	    this.backward = q.backward;
-	    this.visitedNodes = new ArrayList<Node>(q.visitedNodes);
-	    this.visitedGroups = new LinkedHashSet<>(q.visitedGroups);
-	    this.orangeNodes = new HashMap<Long, Collection<Node>>(q.orangeNodes);
-	}
+    private List<Node> visitedNodes;
 
-    public SearchQuery(int source, int destination) {
+    private Set<GroupName> visitedGroups;
+
+    /**
+     * Nodes that did not get a message due to the probability will be marked as
+     * "orange". If the searched for node lies not on the direct, highest-degree
+     * path and we have to start performing backtracking, we gotta visit those
+     * orange nodes again, so we can be sure that we visit all nodes.
+     */
+    private Map<Long, Collection<Node>> orangeNodes;
+
+    private int movedInRound = -1;
+
+    /**
+     * Copy constructor
+     * 
+     * @param q
+     */
+    public SearchQuery(SearchQuery q) {
+        this.source = q.source;
+        this.destination = q.destination;
+        this.backward = q.backward;
+        this.visitedNodes = new ArrayList<Node>(q.visitedNodes);
+        this.visitedGroups = new LinkedHashSet<>(q.visitedGroups);
+        this.orangeNodes = new HashMap<Long, Collection<Node>>(q.orangeNodes);
+        this.creationRound = q.creationRound;
+        // because of the cloning we will just assume, that it will be moved immediately
+        this.movedInRound = CommonState.getIntTime();
+    }
+
+    public SearchQuery(int source, int destination, int creationRound) {
         this.source = source;
         this.destination = destination;
         this.backward = false;
         this.visitedNodes = new ArrayList<Node>();
         this.visitedGroups = new LinkedHashSet<>();
         this.orangeNodes = new HashMap<Long, Collection<Node>>();
+        this.creationRound = creationRound;
     }
 
     public List<Node> getVisitedNodes() {
@@ -103,6 +117,22 @@ public class SearchQuery {
     public Map<Long, Collection<Node>> getOrangeNodes() {
         return orangeNodes;
     }
+
+    public int getCreationRound() {
+        return creationRound;
+    }
+
+    /**
+     * Because of the cycle driven system we shall only move a message once each
+     * round, or we will never be able to make use of the TTL and the whole
+     * network will be congested after one or two rounds.
+     */
+    public void movedThisRound() {
+        this.movedInRound = CommonState.getIntTime();
+    }
     
-	
+    public boolean hasBeenMovedThisRound(){
+        return movedInRound == CommonState.getIntTime();
+    }
+
 }
