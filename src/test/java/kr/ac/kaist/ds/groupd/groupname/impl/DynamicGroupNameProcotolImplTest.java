@@ -55,7 +55,7 @@ public class DynamicGroupNameProcotolImplTest {
 		GeneralNode node = new GeneralNode(null);
 		Network.add(node);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
-		GroupName<String> createGroupName = nameProtocol.createGroupName();
+		GroupName createGroupName = nameProtocol.createGroupName();
 		assertThat(
 				createGroupName,
 				is(equalTo(new DynamicGroupName("00"
@@ -77,7 +77,7 @@ public class DynamicGroupNameProcotolImplTest {
 		interestProtocol.addNeighbor(node2);
 		interestProtocol.addNeighbor(node3);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
-		GroupName<String> createGroupName = nameProtocol.createGroupName();
+		GroupName createGroupName = nameProtocol.createGroupName();
 		assertThat(
 				createGroupName,
 				is(equalTo(new DynamicGroupName("0"
@@ -91,7 +91,7 @@ public class DynamicGroupNameProcotolImplTest {
 		DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol(
 				"protocol.foo");
 		nameProtocol.nextCycle(Network.get(0), Configuration.getPid("test"));
-		GroupName<String> createGroupName = nameProtocol.createGroupName();
+		GroupName createGroupName = nameProtocol.createGroupName();
 		assertThat(nameProtocol.compareWithGroupName(createGroupName), is(true));
 	}
 

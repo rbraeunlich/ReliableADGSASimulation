@@ -17,7 +17,6 @@ import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import peersim.config.Configuration;
 import peersim.core.Linkable;
 import peersim.core.Node;
-import peersim.graph.NeighbourListGraph;
 
 public class InterestProtocolImpl implements InterestProtocol {
 
@@ -173,7 +172,6 @@ public class InterestProtocolImpl implements InterestProtocol {
     private void createAndSetGroupName(GroupNameProtocol namingProtocol) {
         GroupName groupName = namingProtocol.createGroupName();
         for (Node n : getNeighbours()) {
-            @SuppressWarnings("unchecked")
             GroupNameProtocol namingProtocolOther = (GroupNameProtocol)n
                     .getProtocol(namingProtocolPid);
             namingProtocolOther.setGroupName(groupName);
@@ -334,10 +332,16 @@ public class InterestProtocolImpl implements InterestProtocol {
                     return calculateSimilarity(node, n, protocolID);
                 }));
         Node potentialRepresentative = similarities.entrySet().stream()
-                .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue())).limit(1)
-                .collect(Collectors.toList()).get(0).getKey();
+                .reduce((e1, e2) -> {
+                    if(e1.getValue() > e2.getValue()){
+                        return e1;
+                    }
+                    return e2;
+                })
+                .map(e -> e.getKey()).get();
         InterestProtocol otherInterestProtocol = (InterestProtocol)potentialRepresentative
                 .getProtocol(protocolID);
+        //did the most similar node choose a representative that is reachable from here?
         if (otherInterestProtocol.getRepresentative() != null) {
             if(getNeighbours().contains(otherInterestProtocol.getRepresentative())){
                 setRepresentative(otherInterestProtocol.getRepresentative());

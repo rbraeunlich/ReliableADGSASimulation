@@ -4,7 +4,6 @@ package kr.ac.kaist.ds.groupd.managing;
 import java.util.Date;
 import java.util.Random;
 
-import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
