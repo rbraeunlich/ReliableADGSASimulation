@@ -42,7 +42,7 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     private double magnitude = 0.0;
 
-    private boolean startElection = true;
+    private boolean startElection = false;
 
     private final double clusteringCoefficient;
 
@@ -161,11 +161,16 @@ public class InterestProtocolImpl implements InterestProtocol {
         if (startElection) {
             startCommunityFormation(node, protocolID);
             startElection = false;
-            if (isThisNodeRepresentativeForSomeone(node, protocolID)) {
-                GroupNameProtocol namingProtocol = (GroupNameProtocol)node
-                        .getProtocol(namingProtocolPid);
-                createAndSetGroupName(namingProtocol, node, protocolID);
-            }
+            performGroupNameSetting(node, protocolID);
+        }
+    }
+
+    @Override
+    public void performGroupNameSetting(Node node, int protocolID) {
+        if (isThisNodeRepresentativeForSomeone(node, protocolID)) {
+            GroupNameProtocol namingProtocol = (GroupNameProtocol)node
+                    .getProtocol(namingProtocolPid);
+            createAndSetGroupName(namingProtocol, node, protocolID);
         }
     }
 
@@ -182,7 +187,7 @@ public class InterestProtocolImpl implements InterestProtocol {
             .forEach(p -> p.setGroupName(groupName));
     }
 
-    private void startCommunityFormation(Node node, int protocolID) {
+    public void startCommunityFormation(Node node, int protocolID) {
         createLocalCommunities(node, protocolID);
         createGlobalCommunities(node, protocolID);
         resetVotes(node, protocolID);
@@ -204,7 +209,7 @@ public class InterestProtocolImpl implements InterestProtocol {
             Node neighbour = links.getNeighbor(i);
             double similarity = calculateSimilarity(node, neighbour, protocolID);
             if (similarity > clusteringCoefficient) {
-                InterestProtocolImpl node2Protocol = (InterestProtocolImpl)neighbour
+                InterestProtocol node2Protocol = (InterestProtocol)neighbour
                         .getProtocol(protocolID);
                 this.addNeighbor(neighbour);
                 node2Protocol.addNeighbor(node);

@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.util.Properties;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
-import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -72,7 +72,7 @@ public class DynamicGroupNameProcotolImplTest {
 		Network.add(node);
 		Network.add(node2);
 		Network.add(node3);
-		InterestProtocolImpl interestProtocol = (InterestProtocolImpl) node
+		InterestProtocol interestProtocol = (InterestProtocol) node
 				.getProtocol(Configuration.getPid("protocol.foo.interestgroup"));
 		interestProtocol.addNeighbor(node2);
 		interestProtocol.addNeighbor(node3);
@@ -103,7 +103,7 @@ public class DynamicGroupNameProcotolImplTest {
 		Network.add(node2);
 		DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol(
 				"protocol.foo");
-		InterestProtocolImpl interestProtocol = (InterestProtocolImpl) node
+		InterestProtocol interestProtocol = (InterestProtocol) node
 				.getProtocol(Configuration.getPid("protocol.foo.interestgroup"));
 		interestProtocol.addNeighbor(node2);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
@@ -123,7 +123,7 @@ public class DynamicGroupNameProcotolImplTest {
 		Network.add(node3);
 		DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol(
 				"protocol.foo");
-		InterestProtocolImpl interestProtocol = (InterestProtocolImpl) node
+		InterestProtocol interestProtocol = (InterestProtocol) node
 				.getProtocol(Configuration.getPid("protocol.foo.interestgroup"));
 		interestProtocol.addNeighbor(node2);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));

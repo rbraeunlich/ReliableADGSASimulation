@@ -66,7 +66,7 @@ public class Manager implements Control {
      */
     private void changeNetwork() {
         Node node = insertNewNodeIntoNetwork();
-        InterestProtocolImpl interestGroupProtocol = (InterestProtocolImpl)node
+        InterestProtocol interestGroupProtocol = (InterestProtocol)node
                 .getProtocol(interestGroupPid);
         //TODO should we also start the election for other nodes?
         interestGroupProtocol.startElection();
@@ -104,7 +104,7 @@ public class Manager implements Control {
      * Since the similarity is commutative, we do not need to check all nodes in the network
      */
     private void removeNodeFromAllOldNeigbours(Node removedNode,
-            InterestProtocolImpl oldNodeInterestGroupProtocol) {
+            InterestProtocol oldNodeInterestGroupProtocol) {
         Collection<Node> neighbours = oldNodeInterestGroupProtocol.getNeighbours();
         neighbours.stream()
             .map(n -> (InterestProtocol)n.getProtocol(interestGroupPid))

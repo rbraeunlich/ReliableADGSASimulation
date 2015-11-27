@@ -41,4 +41,6 @@ public interface InterestProtocol extends CDProtocol, Linkable {
 
     void resetVotes();
 
+    void performGroupNameSetting(Node node, int protocolID);
+
 }

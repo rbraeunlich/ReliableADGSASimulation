@@ -4,7 +4,7 @@ import java.util.Date;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
-import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import peersim.config.Configuration;
 import peersim.core.Node;
 
@@ -34,7 +34,7 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 		if(this.groupName != null){
 			return groupName;
 		}
-		InterestProtocolImpl interestProtocol = (InterestProtocolImpl) node.getProtocol(interestProtocolPid);
+		InterestProtocol interestProtocol = (InterestProtocol) node.getProtocol(interestProtocolPid);
 		Node representative = interestProtocol.getRepresentative();
 		//FIXME for now we use the ID and do not generate a MAC address
 		long id = representative.getID();

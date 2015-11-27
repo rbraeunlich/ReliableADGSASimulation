@@ -7,7 +7,6 @@ import java.util.HashSet;
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
-import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import peersim.config.Configuration;
 import peersim.core.Node;
 
@@ -85,7 +84,7 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol{
 
     @Override
     public GroupName createGroupName(Node node) {
-        InterestProtocolImpl interestProtocol = (InterestProtocolImpl)node
+        InterestProtocol interestProtocol = (InterestProtocol)node
                 .getProtocol(interestProtocolPid);
         Collection<Node> interestCommunity = new HashSet<>(interestProtocol.getNeighbours());
         interestCommunity.add(node);
