@@ -1,4 +1,4 @@
-simulation.cycles 10
+simulation.cycles 20
 #the number of users in the movielens 1 mio. dataset
 network.size 6040
 
@@ -24,7 +24,7 @@ protocol.search.naming name
 protocol.search.interestgroup interest
 protocol.search.prob 0.1
 protocol.search.query.ttl 20
-protocol.search.queue.size 128
+protocol.search.queue.size 20
 
 ################### initialization ======================
 
@@ -62,7 +62,7 @@ control.0.init.0.undir
 #control.1.format gml
 #control.1.outf D:\workspace\DS_workspace\ReliableADGSASimulation\TEST
 
-control.stats kr.ac.kaist.ds.groupd.util.StatisticsPrinter
+control.stats kr.ac.kaist.ds.groupd.statistics.StatisticsPrinter
 control.stats.FINAL
 
 

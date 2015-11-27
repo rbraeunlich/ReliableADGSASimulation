@@ -9,9 +9,10 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.MinMaxPriorityQueue;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
@@ -54,7 +55,15 @@ public class SearchProtocolImpl implements SearchProtocol {
         this.probabilityPk = Configuration.getDouble(prefix + "." + PAR_GOSSIP_PROBABILITY);
         this.quertyTtl = Configuration.getInt(prefix + "." + PAR_QUERY_TTL);
         this.queueSize = Configuration.getInt(prefix + "." + PAR_QUEUE_SIZE);
-        searchQueries = new LinkedBlockingQueue<>(queueSize);
+        searchQueries = createQueue();
+    }
+
+    /**
+     * Because of clone() we always have to do it twice and I keep forgetting to change both places.
+     * @return
+     */
+    private MinMaxPriorityQueue<SearchQuery> createQueue() {
+        return MinMaxPriorityQueue.<SearchQuery>orderedBy((q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward())).maximumSize(queueSize).create();
     }
 
     /**
@@ -67,7 +76,7 @@ public class SearchProtocolImpl implements SearchProtocol {
         if (isDestinationReached(node, searchQuery)) {
             searchQuery.setBackward(true);
             // put it back in, because we removed it
-            this.searchQueries.offer(searchQuery);
+            addSearchQuery(searchQuery);
 //            Logger.getLogger(getClass().getName()).info("Destination found");
             StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size());
             return;
@@ -351,14 +360,17 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @see kr.ac.kaist.ds.groupd.search.SearchProtocol#setSearchQuery(kr.ac.kaist.ds.groupd.search.SearchQuery)
      */
     public void addSearchQuery(SearchQuery q) {
-        searchQueries.offer(q);
+        boolean offer = searchQueries.offer(q);
+        if(!offer){
+            System.out.println(q);
+        }
     }
 
     @Override
     public Object clone() {
         try {
             SearchProtocolImpl clone = (SearchProtocolImpl)super.clone();
-            clone.searchQueries = new LinkedBlockingQueue<>(queueSize);
+            clone.searchQueries = createQueue();
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
