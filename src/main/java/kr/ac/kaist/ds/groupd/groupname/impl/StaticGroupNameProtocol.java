@@ -6,7 +6,6 @@ import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 import peersim.config.Configuration;
-import peersim.core.Network;
 import peersim.core.Node;
 
 public class StaticGroupNameProtocol implements GroupNameProtocol {
@@ -14,8 +13,6 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 	private GroupName  groupName;
 
 	private int interestProtocolPid;
-
-	private long nodeId;
 
 	public StaticGroupNameProtocol(String prefix) {
 		this.interestProtocolPid = Configuration.getPid(prefix
@@ -33,11 +30,10 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 	}
 
 	@Override
-	public GroupName  createGroupName() {
+	public GroupName  createGroupName(Node node) {
 		if(this.groupName != null){
 			return groupName;
 		}
-		Node node = findNode();
 		InterestProtocolImpl interestProtocol = (InterestProtocolImpl) node.getProtocol(interestProtocolPid);
 		Node representative = interestProtocol.getRepresentative();
 		//FIXME for now we use the ID and do not generate a MAC address
@@ -45,15 +41,6 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 		long timestamp = new Date().getTime();
 		groupName = new StaticGroupName(String.valueOf(id), timestamp);
 		return groupName;
-	}
-
-	private Node findNode() {
-		for (int i = 0; i < Network.size(); i++) {
-			if (Network.get(i).getID() == nodeId) {
-				return Network.get(i);
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -68,7 +55,6 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 
 	@Override
 	public void nextCycle(Node node, int protocolID) {
-		this.nodeId = node.getID();
 	}
 	
     @Override

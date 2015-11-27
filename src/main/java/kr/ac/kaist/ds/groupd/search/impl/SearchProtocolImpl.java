@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
+import kr.ac.kaist.ds.groupd.util.StatisticsCollector;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Node;
@@ -29,8 +32,10 @@ public class SearchProtocolImpl implements SearchProtocol {
     private static final String PAR_GOSSIP_PROBABILITY = "prob";
 
     private static final String PAR_QUERY_TTL = "query.ttl";
+    
+    private static final String PAR_QUEUE_SIZE = "queue.size";
 
-    private Collection<SearchQuery> searchQueries = new ArrayList<>();
+    private Queue<SearchQuery> searchQueries;
 
     private int namingProtocolPid;
 
@@ -40,12 +45,16 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private int quertyTtl;
 
+    private int queueSize;
+    
     public SearchProtocolImpl(String prefix) {
         this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAME_PROTOCOL);
         this.interestGroupProtocolPid = Configuration
                 .getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
         this.probabilityPk = Configuration.getDouble(prefix + "." + PAR_GOSSIP_PROBABILITY);
         this.quertyTtl = Configuration.getInt(prefix + "." + PAR_QUERY_TTL);
+        this.queueSize = Configuration.getInt(prefix + "." + PAR_QUEUE_SIZE);
+        searchQueries = new LinkedBlockingQueue<>(queueSize);
     }
 
     /**
@@ -58,12 +67,13 @@ public class SearchProtocolImpl implements SearchProtocol {
         if (isDestinationReached(node, searchQuery)) {
             searchQuery.setBackward(true);
             // put it back in, because we removed it
-            this.searchQueries.add(searchQuery);
-            Logger.getLogger(getClass().getName()).info("Destination found");
+            this.searchQueries.offer(searchQuery);
+//            Logger.getLogger(getClass().getName()).info("Destination found");
+            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size());
             return;
         }
         if (isSearchBackAtSource(node, searchQuery)) {
-            Logger.getLogger(getClass().getName()).info("Back at source, search unsuccessful.");
+//            Logger.getLogger(getClass().getName()).info("Back at source, search unsuccessful.");
             return;
         }
         InterestProtocol interestProtocol = getInterestProtocolFrom(node);
@@ -214,8 +224,10 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @param searchQuery
      */
     private void performBacktracking(Node node, int protocolID, SearchQuery searchQuery) {
+        searchQuery.addBacktrackHop();
         if (node.getID() == searchQuery.getSource()) {
             Logger.getLogger(this.getClass().getName()).info("back home!");
+            StatisticsCollector.arrivedBackAtSource(searchQuery.getBacktrackHops());
             return;
         }
         Node lastNode = searchQuery.getVisitedNodes().get(searchQuery.getVisitedNodes().size() - 1);
@@ -339,14 +351,14 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @see kr.ac.kaist.ds.groupd.search.SearchProtocol#setSearchQuery(kr.ac.kaist.ds.groupd.search.SearchQuery)
      */
     public void addSearchQuery(SearchQuery q) {
-        searchQueries.add(q);
+        searchQueries.offer(q);
     }
 
     @Override
     public Object clone() {
         try {
             SearchProtocolImpl clone = (SearchProtocolImpl)super.clone();
-            clone.searchQueries = new ArrayList<>();
+            clone.searchQueries = new LinkedBlockingQueue<>(queueSize);
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();

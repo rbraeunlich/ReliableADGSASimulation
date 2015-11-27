@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -160,21 +161,25 @@ public class InterestProtocolImpl implements InterestProtocol {
         if (startElection) {
             startCommunityFormation(node, protocolID);
             startElection = false;
-            if (this.getRepresentative().equals(node)) {
-                GroupNameProtocol namingProtocol = (GroupNameProtocol) node
+            if (isThisNodeRepresentativeForSomeone(node, protocolID)) {
+                GroupNameProtocol namingProtocol = (GroupNameProtocol)node
                         .getProtocol(namingProtocolPid);
-                createAndSetGroupName(namingProtocol);
+                createAndSetGroupName(namingProtocol, node, protocolID);
             }
         }
     }
 
-    private void createAndSetGroupName(GroupNameProtocol namingProtocol) {
-        GroupName groupName = namingProtocol.createGroupName();
-        for (Node n : getNeighbours()) {
-            GroupNameProtocol namingProtocolOther = (GroupNameProtocol)n
-                    .getProtocol(namingProtocolPid);
-            namingProtocolOther.setGroupName(groupName);
-        }
+    private boolean isThisNodeRepresentativeForSomeone(Node node, int protocolID) {
+        return getNeighbours().stream().map(n -> (InterestProtocol)n.getProtocol(protocolID))
+                .anyMatch(p -> node.equals(p.getRepresentative()));
+    }
+
+    private void createAndSetGroupName(GroupNameProtocol namingProtocol, Node node, int protocolID) {
+        GroupName groupName = namingProtocol.createGroupName(node);
+        getNeighbours().stream()
+            .filter(n -> node.equals(((InterestProtocol)n.getProtocol(protocolID)).getRepresentative()))
+            .map(n -> (GroupNameProtocol)n.getProtocol(namingProtocolPid))
+            .forEach(p -> p.setGroupName(groupName));
     }
 
     private void startCommunityFormation(Node node, int protocolID) {
@@ -303,26 +308,36 @@ public class InterestProtocolImpl implements InterestProtocol {
      * The candidate with the most votes will be selected as representative.
      */
     private void actualRepresentativeElection(Node node, int protocolID) {
-        // I will skip the special cases for now, see
-        // A peer-to-peer recommender system for self-emerging user communities
-        // based on gossip overlays (2013)
-        // for that
         Collection<Node> candidates = new ArrayList<Node>(getNeighbours());
         candidates.add(node);
-        List<Node> representative = candidates.stream()
+        Optional<Node> representative = candidates.stream()
                 .filter(n -> ((InterestProtocolImpl)n.getProtocol(protocolID))
                         .getRepresentativeVotes() > 0)
-                .sorted((n,
-                        n2) -> ((InterestProtocolImpl)n.getProtocol(protocolID))
-                                .getRepresentativeVotes()
-                                .compareTo(((InterestProtocolImpl)n2.getProtocol(protocolID))
-                                        .getRepresentativeVotes()))
-                .limit(1).collect(Collectors.toList());
-        if (!representative.isEmpty()) {
-            this.setRepresentative(representative.get(0));
+                .max((n, n2) -> ((InterestProtocolImpl)n.getProtocol(protocolID))
+                        .getRepresentativeVotes()
+                        .compareTo(((InterestProtocolImpl)n2.getProtocol(protocolID))
+                                .getRepresentativeVotes()));
+        if (representative.isPresent()
+                && !hasNodeDifferentReachableRepresentative(representative.get(), protocolID)) {
+            this.setRepresentative(representative.get());
+        } else if (representative.isPresent()
+                && hasNodeDifferentReachableRepresentative(representative.get(), protocolID)) {
+            InterestProtocol otherInterestProtocol = (InterestProtocol)representative.get()
+                    .getProtocol(protocolID);
+            this.setRepresentative(otherInterestProtocol.getRepresentative());
         } else {
             takeMostSimilarRepresentativeFromNeighbours(node, protocolID);
         }
+    }
+
+    private boolean hasNodeDifferentReachableRepresentative(Node node, int protocolID) {
+        InterestProtocol interestProtocol = (InterestProtocol)node.getProtocol(protocolID);
+        if (interestProtocol.getRepresentative() != null) {
+            if (getNeighbours().contains(interestProtocol.getRepresentative())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void takeMostSimilarRepresentativeFromNeighbours(Node node, int protocolID) {
@@ -330,21 +345,18 @@ public class InterestProtocolImpl implements InterestProtocol {
                 .collect(Collectors.toMap(n -> n, n -> {
                     return calculateSimilarity(node, n, protocolID);
                 }));
-        Node potentialRepresentative = similarities.entrySet().stream()
-                .reduce((e1, e2) -> {
-                    if(e1.getValue() > e2.getValue()){
-                        return e1;
-                    }
-                    return e2;
-                })
-                .map(e -> e.getKey()).get();
+        Node potentialRepresentative = similarities.entrySet().stream().reduce((e1, e2) -> {
+            if (e1.getValue() > e2.getValue()) {
+                return e1;
+            }
+            return e2;
+        }).map(e -> e.getKey()).get();
         InterestProtocol otherInterestProtocol = (InterestProtocol)potentialRepresentative
                 .getProtocol(protocolID);
-        //did the most similar node choose a representative that is reachable from here?
-        if (otherInterestProtocol.getRepresentative() != null) {
-            if(getNeighbours().contains(otherInterestProtocol.getRepresentative())){
-                setRepresentative(otherInterestProtocol.getRepresentative());
-            }
+        // did the most similar node choose a representative that is reachable
+        // from here?
+        if (hasNodeDifferentReachableRepresentative(node, protocolID)) {
+            setRepresentative(otherInterestProtocol.getRepresentative());
         } else {
             setRepresentative(potentialRepresentative);
         }
@@ -388,7 +400,7 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     @Override
     public boolean addNeighbor(Node neighbour) {
-        if(interestCommunity.contains(neighbour)){
+        if (interestCommunity.contains(neighbour)) {
             return false;
         }
         return interestCommunity.add(neighbour);
@@ -407,5 +419,4 @@ public class InterestProtocolImpl implements InterestProtocol {
     public void onKill() {
     }
 
-   
 }

@@ -55,7 +55,7 @@ public class DynamicGroupNameProcotolImplTest {
 		GeneralNode node = new GeneralNode(null);
 		Network.add(node);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
-		GroupName createGroupName = nameProtocol.createGroupName();
+		GroupName createGroupName = nameProtocol.createGroupName(node);
 		assertThat(
 				createGroupName,
 				is(equalTo(new DynamicGroupName("00"
@@ -77,7 +77,7 @@ public class DynamicGroupNameProcotolImplTest {
 		interestProtocol.addNeighbor(node2);
 		interestProtocol.addNeighbor(node3);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
-		GroupName createGroupName = nameProtocol.createGroupName();
+		GroupName createGroupName = nameProtocol.createGroupName(node);
 		assertThat(
 				createGroupName,
 				is(equalTo(new DynamicGroupName("0"
@@ -91,7 +91,7 @@ public class DynamicGroupNameProcotolImplTest {
 		DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol(
 				"protocol.foo");
 		nameProtocol.nextCycle(Network.get(0), Configuration.getPid("test"));
-		GroupName createGroupName = nameProtocol.createGroupName();
+		GroupName createGroupName = nameProtocol.createGroupName(Network.get(0));
 		assertThat(nameProtocol.compareWithGroupName(createGroupName), is(true));
 	}
 
@@ -107,7 +107,7 @@ public class DynamicGroupNameProcotolImplTest {
 				.getProtocol(Configuration.getPid("protocol.foo.interestgroup"));
 		interestProtocol.addNeighbor(node2);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
-		nameProtocol.createGroupName();
+		nameProtocol.createGroupName(node);
 		assertThat(
 				nameProtocol.compareWithGroupName(new DynamicGroupName("0000"
 						+ "0" + Long.toBinaryString(node2.getID()))), is(true));
@@ -127,7 +127,7 @@ public class DynamicGroupNameProcotolImplTest {
 				.getProtocol(Configuration.getPid("protocol.foo.interestgroup"));
 		interestProtocol.addNeighbor(node2);
 		nameProtocol.nextCycle(node, Configuration.getPid("test"));
-		nameProtocol.createGroupName();
+		nameProtocol.createGroupName(node);
 		assertThat(
 				nameProtocol.compareWithGroupName(new DynamicGroupName("0000000"
 						+ Long.toBinaryString(node3.getID()))), is(false));

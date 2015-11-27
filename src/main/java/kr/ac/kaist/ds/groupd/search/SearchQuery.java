@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
+import kr.ac.kaist.ds.groupd.util.StatisticsCollector;
 import peersim.core.CommonState;
 import peersim.core.Node;
 
@@ -43,6 +44,8 @@ public class SearchQuery {
 
     private int movedInRound = -1;
 
+    private int backTrackHops;
+
     /**
      * Copy constructor
      * 
@@ -58,6 +61,7 @@ public class SearchQuery {
         this.creationRound = q.creationRound;
         // because of the cloning we will just assume, that it will be moved immediately
         this.movedInRound = CommonState.getIntTime();
+        StatisticsCollector.queryCreated();
     }
 
     public SearchQuery(int source, int destination, int creationRound) {
@@ -68,6 +72,7 @@ public class SearchQuery {
         this.visitedGroups = new LinkedHashSet<>();
         this.orangeNodes = new HashMap<Long, Collection<Node>>();
         this.creationRound = creationRound;
+        StatisticsCollector.queryCreated();
     }
 
     public List<Node> getVisitedNodes() {
@@ -133,6 +138,17 @@ public class SearchQuery {
     
     public boolean hasBeenMovedThisRound(){
         return movedInRound == CommonState.getIntTime();
+    }
+
+    /**
+     * For the statistics.
+     */
+    public void addBacktrackHop() {
+        this.backTrackHops++;
+    }
+    
+    public int getBacktrackHops(){
+        return backTrackHops;
     }
 
 }

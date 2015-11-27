@@ -1,16 +1,15 @@
 
 package kr.ac.kaist.ds.groupd.groupname.impl;
 
-import peersim.config.Configuration;
-import peersim.core.Network;
-import peersim.core.Node;
-
 import java.util.Collection;
 import java.util.HashSet;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
+import peersim.config.Configuration;
+import peersim.core.Node;
 
 public class DynamicGroupNameProtocol implements GroupNameProtocol{
 
@@ -24,8 +23,6 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol{
 
     private int bitsUsed;
 
-    private long nodeId;
-
     private GroupName groupName;
 
     public DynamicGroupNameProtocol(String prefix) {
@@ -36,7 +33,6 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol{
 
     @Override
     public void nextCycle(Node node, int protocolID) {
-        this.nodeId = node.getID();
     }
 
     @Override
@@ -88,13 +84,16 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol{
     }
 
     @Override
-    public GroupName createGroupName() {
-        Node node = findNode();
+    public GroupName createGroupName(Node node) {
         InterestProtocolImpl interestProtocol = (InterestProtocolImpl)node
                 .getProtocol(interestProtocolPid);
         Collection<Node> interestCommunity = new HashSet<>(interestProtocol.getNeighbours());
         interestCommunity.add(node);
         String groupId = interestCommunity.stream()
+                .filter(n -> {
+                 Node representative = ((InterestProtocol)n.getProtocol(interestProtocolPid)).getRepresentative();
+                return node.equals(representative);
+                })
                 .sorted((n1, n2) -> Long.compare(n1.getID(), n2.getID()))
                 .map(n -> Long.toBinaryString(n.getID())).map(s -> {
                     if (s.length() >= bitsUsed) {
@@ -120,15 +119,6 @@ public class DynamicGroupNameProtocol implements GroupNameProtocol{
             e.printStackTrace();
             return null;
         }
-    }
-
-    private Node findNode() {
-        for (int i = 0; i < Network.size(); i++) {
-            if (Network.get(i).getID() == nodeId) {
-                return Network.get(i);
-            }
-        }
-        return null;
     }
 
     @Override
