@@ -1,4 +1,4 @@
-package kr.ac.kaist.ds.groupd.util;
+package kr.ac.kaist.ds.groupd.statistics;
 
 import java.util.logging.Logger;
 

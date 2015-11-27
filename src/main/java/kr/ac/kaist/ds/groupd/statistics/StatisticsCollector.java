@@ -1,5 +1,5 @@
 
-package kr.ac.kaist.ds.groupd.util;
+package kr.ac.kaist.ds.groupd.statistics;
 
 import peersim.util.IncrementalStats;
 

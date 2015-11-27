@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
-import kr.ac.kaist.ds.groupd.util.StatisticsCollector;
+import kr.ac.kaist.ds.groupd.statistics.StatisticsCollector;
 import peersim.core.CommonState;
 import peersim.core.Node;
 

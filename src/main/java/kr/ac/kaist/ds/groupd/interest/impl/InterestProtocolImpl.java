@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -182,9 +181,10 @@ public class InterestProtocolImpl implements InterestProtocol {
     private void createAndSetGroupName(GroupNameProtocol namingProtocol, Node node, int protocolID) {
         GroupName groupName = namingProtocol.createGroupName(node);
         getNeighbours().stream()
-            .filter(n -> node.equals(((InterestProtocol)n.getProtocol(protocolID)).getRepresentative()))
-            .map(n -> (GroupNameProtocol)n.getProtocol(namingProtocolPid))
-            .forEach(p -> p.setGroupName(groupName));
+                .filter(n -> node
+                        .equals(((InterestProtocol)n.getProtocol(protocolID)).getRepresentative()))
+                .map(n -> (GroupNameProtocol)n.getProtocol(namingProtocolPid))
+                .forEach(p -> p.setGroupName(groupName));
     }
 
     public void startCommunityFormation(Node node, int protocolID) {
@@ -263,20 +263,29 @@ public class InterestProtocolImpl implements InterestProtocol {
 
     /**
      * The most similiar neighbours get a vote. The number of votes that can be
-     * given is defined {@link #numberCandidateVotes}
+     * given is defined {@link #numberCandidateVotes}. After that the vodes from
+     * the neighbours are being collected.
      * 
      * @param protocolID
      * @param node
      */
     private void candidateSelectionAndVote(Node node, int protocolID) {
-        Map<Node, Double> votings = new HashMap<Node, Double>();
+        makeCandidateVotes(node, protocolID);
+        getNeighbours().stream().forEach(n -> makeCandidateVotes(n, protocolID));
+    }
+
+    /**
+     * Make up to {@link #numberCandidateVotes} candidate votes at the most
+     * similar nodes. This method will be called from outside, too, to collect
+     * votes.
+     */
+    public void makeCandidateVotes(Node node, int protocolID) {
+        Map<Node, Double> similarities = new HashMap<Node, Double>();
         for (Node neighbour : getNeighbours()) {
             double similarity = calculateSimilarity(node, neighbour, protocolID);
-            votings.put(new ComparableNode(neighbour), similarity);
+            similarities.put(new ComparableNode(neighbour), similarity);
         }
-        List<Entry<Node, Double>> listVotings = new ArrayList<Entry<Node, Double>>(
-                votings.entrySet());
-        listVotings.stream().sorted((v, v2) -> v.getValue().compareTo(v2.getValue()))
+        similarities.entrySet().stream().sorted((v, v2) -> v.getValue().compareTo(v2.getValue()))
                 .limit(numberCandidateVotes).map(c -> c.getKey())
                 .map(n -> (InterestProtocolImpl)n.getProtocol(protocolID))
                 .forEach(p -> p.receiveCandidateVote());

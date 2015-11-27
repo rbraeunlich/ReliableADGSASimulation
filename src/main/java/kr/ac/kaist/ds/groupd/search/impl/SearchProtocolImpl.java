@@ -18,7 +18,7 @@ import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
-import kr.ac.kaist.ds.groupd.util.StatisticsCollector;
+import kr.ac.kaist.ds.groupd.statistics.StatisticsCollector;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Node;
