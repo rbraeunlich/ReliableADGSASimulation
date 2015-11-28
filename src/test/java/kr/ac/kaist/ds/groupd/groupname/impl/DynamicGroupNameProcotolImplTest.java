@@ -86,7 +86,7 @@ public class DynamicGroupNameProcotolImplTest {
     public void compareWithEqualName() {
         DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol("protocol.foo");
         nameProtocol.nextCycle(Network.get(0), Configuration.getPid("test"));
-        GroupName createGroupName = nameProtocol.createGroupName(new nodeNetwork.get(0));
+        GroupName createGroupName = nameProtocol.createGroupName(Network.get(0));
         assertThat(nameProtocol.compareWithGroupName(createGroupName), is(true));
     }
 
