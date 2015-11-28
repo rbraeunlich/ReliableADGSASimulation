@@ -12,13 +12,12 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.MinMaxPriorityQueue;
-
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.groupname.GroupNameProtocol;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchProtocol;
 import kr.ac.kaist.ds.groupd.search.SearchQuery;
+import kr.ac.kaist.ds.groupd.search.SearchQueryPriorityQueue;
 import kr.ac.kaist.ds.groupd.statistics.StatisticsCollector;
 import peersim.config.Configuration;
 import peersim.core.CommonState;
@@ -62,8 +61,9 @@ public class SearchProtocolImpl implements SearchProtocol {
      * Because of clone() we always have to do it twice and I keep forgetting to change both places.
      * @return
      */
-    private MinMaxPriorityQueue<SearchQuery> createQueue() {
-        return MinMaxPriorityQueue.<SearchQuery>orderedBy((q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward())).maximumSize(queueSize).create();
+    private Queue<SearchQuery> createQueue() {
+//        return MinMaxPriorityQueue.<SearchQuery>orderedBy((q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward())).maximumSize(queueSize).create();
+        return new SearchQueryPriorityQueue<>(queueSize, (q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward()));
     }
 
     /**
@@ -360,10 +360,7 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @see kr.ac.kaist.ds.groupd.search.SearchProtocol#setSearchQuery(kr.ac.kaist.ds.groupd.search.SearchQuery)
      */
     public void addSearchQuery(SearchQuery q) {
-        boolean offer = searchQueries.offer(q);
-        if(!offer){
-            System.out.println(q);
-        }
+        searchQueries.offer(q);
     }
 
     @Override
