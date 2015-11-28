@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
 import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
+import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import peersim.config.Configuration;
 import peersim.core.GeneralNode;
 import peersim.core.Network;
+import peersim.core.Node;
 
 public class DynamicGroupNameProcotolImplTest {
 
@@ -30,6 +32,12 @@ public class DynamicGroupNameProcotolImplTest {
         prop.put("test", "foo");
         prop.put("protocol.foo.interestgroup", "bar");
         prop.put("protocol.bar", "InterestProtocolImpl");
+        prop.put("protocol.bar.coeff", "0.5");
+        //don't take the following two parameters too serious
+        prop.put("protocol.bar.linkable", "foo");
+        prop.put("protocol.bar.naming", "foo");
+        prop.put("protocol.bar.candVotes", "1");
+        prop.put("protocol.bar.repThreshold", "1");
         prop.put("protocol.foo.similarity", "0.5");
         prop.put("protocol.foo.bits", "4");
         prop.put("network.size", "3");
@@ -54,12 +62,18 @@ public class DynamicGroupNameProcotolImplTest {
     public void createGroupNameSingleNode() {
         DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol("protocol.foo");
         GeneralNode node = new GeneralNode(null);
+        InterestProtocolImpl protocol = getInterestProtocolImplFrom(node);
+        protocol.setRepresentative(node);
         Network.add(node);
         nameProtocol.nextCycle(node, Configuration.getPid("test"));
         GroupName createGroupName = nameProtocol.createGroupName(node);
         assertThat(createGroupName,
                 is(equalTo(new DynamicGroupName("00" + Long.toBinaryString(node.getID())))));
     }
+
+	private InterestProtocolImpl getInterestProtocolImplFrom(Node node) {
+		return (InterestProtocolImpl) node.getProtocol(Configuration.getPid("protocol.foo.interestgroup"));
+	}
 
     @Test
     public void createGroupNameSeveralNodes() {
@@ -70,10 +84,12 @@ public class DynamicGroupNameProcotolImplTest {
         Network.add(node);
         Network.add(node2);
         Network.add(node3);
-        InterestProtocol interestProtocol = (InterestProtocol)node.getProtocol(Configuration
-                .getPid("protocol.foo.interestgroup"));
+        InterestProtocolImpl interestProtocol = getInterestProtocolImplFrom(node);
         interestProtocol.addNeighbor(node2);
         interestProtocol.addNeighbor(node3);
+        interestProtocol.setRepresentative(node);
+        getInterestProtocolImplFrom(node2).setRepresentative(node);
+        getInterestProtocolImplFrom(node3).setRepresentative(node);
         nameProtocol.nextCycle(node, Configuration.getPid("test"));
         GroupName createGroupName = nameProtocol.createGroupName(node);
         assertThat(
@@ -85,8 +101,10 @@ public class DynamicGroupNameProcotolImplTest {
     @Test
     public void compareWithEqualName() {
         DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol("protocol.foo");
-        nameProtocol.nextCycle(Network.get(0), Configuration.getPid("test"));
-        GroupName createGroupName = nameProtocol.createGroupName(Network.get(0));
+        Node node = Network.get(0);
+        getInterestProtocolImplFrom(node).setRepresentative(node);
+		nameProtocol.nextCycle(node, Configuration.getPid("test"));
+        GroupName createGroupName = nameProtocol.createGroupName(node);
         assertThat(nameProtocol.compareWithGroupName(createGroupName), is(true));
     }
 
@@ -116,9 +134,9 @@ public class DynamicGroupNameProcotolImplTest {
         Network.add(node2);
         Network.add(node3);
         DynamicGroupNameProtocol nameProtocol = new DynamicGroupNameProtocol("protocol.foo");
-        InterestProtocol interestProtocol = (InterestProtocol)node.getProtocol(Configuration
-                .getPid("protocol.foo.interestgroup"));
+        InterestProtocol interestProtocol = getInterestProtocolImplFrom(node);
         interestProtocol.addNeighbor(node2);
+        getInterestProtocolImplFrom(node2).setRepresentative(node);
         nameProtocol.nextCycle(node, Configuration.getPid("test"));
         nameProtocol.createGroupName(node);
         assertThat(
