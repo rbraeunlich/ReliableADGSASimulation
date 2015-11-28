@@ -2,10 +2,8 @@
 package kr.ac.kaist.ds.groupd.search;
 
 import java.util.Comparator;
-import java.util.PriorityQueue;
-import kr.ac.kaist.ds.groupd.search.SearchQuery;
 
-public class SpecialSearchQueryPriorityQueue<E> extends SearchQueryPriorityQueue<SearchQuery> {
+public class SpecialSearchQueryPriorityQueue extends SearchQueryPriorityQueue<SearchQuery> {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,7 +36,6 @@ public class SpecialSearchQueryPriorityQueue<E> extends SearchQueryPriorityQueue
             if (searchQuery.getDestination() == element().getDestination()
                     && element().isBackward() == false
                     && searchQuery.getSource() == element().getSource()) {
-
                 this.remove();
             }
         }
