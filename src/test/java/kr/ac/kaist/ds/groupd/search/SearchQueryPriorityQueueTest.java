@@ -25,4 +25,12 @@ public class SearchQueryPriorityQueueTest {
         boolean offer = q.offer(1);
         assertThat(offer, is(false));
     }
+    
+    @Test 
+    public void testSamePriorityElementIsRejectedByFullQueue(){
+        Queue<Integer> q = new SearchQueryPriorityQueue<>(1, (i1, i2) -> i1.compareTo(i2));
+        q.offer(2);
+        boolean offer = q.offer(2);
+        assertThat(offer, is(false));
+    }
 }
