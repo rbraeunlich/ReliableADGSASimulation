@@ -20,8 +20,7 @@ public class SpecialSearchQueryPriorityQueue<E> extends SearchQueryPriorityQueue
     @Override
     public boolean offer(SearchQuery searchQuery) {
 
-        for (int i = 0; i < this.size(); i++)
-            deleteUnnecessarySearchQuery(searchQuery);
+        deleteUnnecessarySearchQuery(searchQuery);
 
         if (this.size() >= fixedSizeOfQueue) {
             SearchQuery element = remove();
@@ -35,11 +34,13 @@ public class SpecialSearchQueryPriorityQueue<E> extends SearchQueryPriorityQueue
     }
 
     private void deleteUnnecessarySearchQuery(SearchQuery searchQuery) {
-        if (searchQuery.getDestination() == element().getDestination()
-                && element().isBackward() == false
-                && searchQuery.getSource() == element().getSource()) {
+        for (int i = this.size(); i > 0; i--) {
+            if (searchQuery.getDestination() == element().getDestination()
+                    && element().isBackward() == false
+                    && searchQuery.getSource() == element().getSource()) {
 
-            this.remove();
+                this.remove();
+            }
         }
 
     }
