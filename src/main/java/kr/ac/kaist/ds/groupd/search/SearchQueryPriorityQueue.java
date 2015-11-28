@@ -9,12 +9,9 @@ public class SearchQueryPriorityQueue<E> extends PriorityQueue<E> {
 
     private final int fixedSizeOfQueue;
 
-    private Comparator<? super E> searchQueryPriorityQueueComparetor;
-
     public SearchQueryPriorityQueue(int initialCapacity, Comparator<? super E> comparator) {
         super(initialCapacity, comparator);
         this.fixedSizeOfQueue = initialCapacity;
-        this.searchQueryPriorityQueueComparetor = comparator;
     }
 
     @SuppressWarnings("unchecked")
@@ -51,15 +48,6 @@ public class SearchQueryPriorityQueue<E> extends PriorityQueue<E> {
             return false;
         }
         return super.add(e);
-    }
-
-    public void setTheSearchQueryPriorityQueueComparetor(Comparator<E> cmpt) {
-        this.searchQueryPriorityQueueComparetor = cmpt;
-    }
-
-    @Override
-    public int size() {
-        return super.size();
     }
 
 }
