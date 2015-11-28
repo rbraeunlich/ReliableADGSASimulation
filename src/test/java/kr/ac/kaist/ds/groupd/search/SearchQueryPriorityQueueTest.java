@@ -33,5 +33,13 @@ public class SearchQueryPriorityQueueTest {
         boolean offer = q.offer(2);
         assertThat(offer, is(false));
     }
+    
+    @Test
+    public void testSamePriorityElementIsRejectedByFullQueueCannotBeTrickedWithContains(){
+        Queue<Object> q = new SearchQueryPriorityQueue<>(1, (i1, i2) -> 0);
+        q.offer(new Object());
+        boolean offer = q.offer(new Object());
+        assertThat(offer, is(false));
+    }
 }
  
