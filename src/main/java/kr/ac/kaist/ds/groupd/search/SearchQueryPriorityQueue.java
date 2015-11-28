@@ -14,9 +14,13 @@ public class SearchQueryPriorityQueue<E> extends PriorityQueue<E> {
         this.fixedSizeOfQueue = initialCapacity;
     }
 
+    /*
+     * add element and check all element usin self comparator
+     * (non-Javadoc)
+     * @see java.util.PriorityQueue#offer(java.lang.Object)
+     */
     @Override
     public boolean offer(E e) {
-
         if (this.contains(e))
             return false;
 
