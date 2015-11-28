@@ -14,40 +14,13 @@ public class SearchQueryPriorityQueue<E> extends PriorityQueue<E> {
         this.fixedSizeOfQueue = initialCapacity;
     }
 
-    @SuppressWarnings("unchecked")
-    public E getTail() {
-        Object[] queue = this.toArray();
-        E tail = (E)queue[0];
-        Comparator<? super E> comparator = this.comparator();
-        if (comparator != null)
-            for (int i = 1; i < this.size(); i++) {
-                if (comparator.compare(tail, (E)queue[i]) < 0)
-                    tail = (E)queue[i];
-            }
-        else
-            for (int j = 1; j < this.size(); j++)
-                if (((Comparable)tail).compareTo(((Comparable)queue[j])) < 0)
-                    tail = (E)queue[j];
-        return tail;
-
-    }
-
-    public E removeTail() {
-        E tail = this.getTail();
-
-        if (this.remove(tail))
-            return tail;
-        return null;
-    }
-
     @Override
     public boolean add(E e) {
         if (this.size() >= fixedSizeOfQueue) {
-            if (null != this.removeTail())
+            if (null != remove())
                 return super.add(e);
             return false;
         }
         return super.add(e);
     }
-
 }
