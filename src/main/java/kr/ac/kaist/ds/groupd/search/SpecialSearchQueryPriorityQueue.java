@@ -1,6 +1,7 @@
 
 package kr.ac.kaist.ds.groupd.search;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 public class SpecialSearchQueryPriorityQueue extends SearchQueryPriorityQueue<SearchQuery> {
@@ -32,7 +33,7 @@ public class SpecialSearchQueryPriorityQueue extends SearchQueryPriorityQueue<Se
     }
 
     private void deleteUnnecessarySearchQuery(SearchQuery searchQuery) {
-        for (SearchQuery q : this) {
+        for( SearchQuery q : new ArrayList<SearchQuery>(this)) {
             if (searchQuery.getDestination() == q.getDestination() && q.isBackward() == false
                     && searchQuery.getSource() == q.getSource()) {
                 this.remove(q);
