@@ -16,17 +16,21 @@ public class SearchQueryPriorityQueue<E> extends PriorityQueue<E> {
 
     @Override
     public boolean offer(E e) {
-        
-        if(this.contains(e))
+
+        if (this.contains(e))
             return false;
-        
+
         if (this.size() >= fixedSizeOfQueue) {
-            if (null != remove())
-                return super.offer(e);
-            
+
+            E element = remove();
+
+            if (null != element)
+                if (this.comparator().compare(element, e) == -1)
+                    return super.offer(e);
+
             return false;
         }
-        
+
         return super.offer(e);
     }
 
