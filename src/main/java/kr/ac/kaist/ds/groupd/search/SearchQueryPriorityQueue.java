@@ -15,12 +15,13 @@ public class SearchQueryPriorityQueue<E> extends PriorityQueue<E> {
     }
 
     @Override
-    public boolean add(E e) {
+    public boolean offer(E e) {
         if (this.size() >= fixedSizeOfQueue) {
             if (null != remove())
-                return super.add(e);
+                return super.offer(e);
             return false;
         }
-        return super.add(e);
+        return super.offer(e);
     }
+
 }
