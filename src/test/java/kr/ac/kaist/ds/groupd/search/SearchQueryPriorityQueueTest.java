@@ -34,3 +34,4 @@ public class SearchQueryPriorityQueueTest {
         assertThat(offer, is(false));
     }
 }
+ 
