@@ -32,11 +32,10 @@ public class SpecialSearchQueryPriorityQueue extends SearchQueryPriorityQueue<Se
     }
 
     private void deleteUnnecessarySearchQuery(SearchQuery searchQuery) {
-        for (int i = this.size(); i > 0; i--) {
-            if (searchQuery.getDestination() == element().getDestination()
-                    && element().isBackward() == false
-                    && searchQuery.getSource() == element().getSource()) {
-                this.remove();
+        for (SearchQuery q : this) {
+            if (searchQuery.getDestination() == q.getDestination() && q.isBackward() == false
+                    && searchQuery.getSource() == q.getSource()) {
+                this.remove(q);
             }
         }
 
