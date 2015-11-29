@@ -20,8 +20,8 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 	}
 
 	@Override
-	public boolean compareWithGroupName(GroupName  otherName) {
-		return otherName.equals(groupName);
+	public boolean compareWithGroupName(GroupName otherName) {
+		return groupName.equals(otherName);
 	}
 
 	@Override

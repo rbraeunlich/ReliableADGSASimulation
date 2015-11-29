@@ -11,24 +11,31 @@ import peersim.core.Node;
  */
 public class VotingInitializer implements Control {
 
-    private static final String PAR_PROT = "protocol";
-    
-    private int pid;
-    
-    public VotingInitializer(String prefix) {
-        this.pid = Configuration.getPid(prefix + "." + PAR_PROT);
-    }
+	private static final String PAR_PROT = "protocol";
 
-    @Override
-    public boolean execute() {
-        for (int i = 0; i < Network.size(); i++) {
-            Node node = Network.get(i);
-            InterestProtocolImpl protocol = (InterestProtocolImpl)node
-                    .getProtocol(pid);
-            protocol.startCommunityFormation(node, pid);
-            protocol.performGroupNameSetting(node, pid);
-        }
-        return false;
-    }
+	private int pid;
+
+	public VotingInitializer(String prefix) {
+		this.pid = Configuration.getPid(prefix + "." + PAR_PROT);
+	}
+
+	@Override
+	public boolean execute() {
+		for (int i = 0; i < Network.size(); i++) {
+			Node node = Network.get(i);
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+					.getProtocol(pid);
+			protocol.startCommunityFormation(node, pid);
+		}
+		//we gotta create the community first and then set the group names or
+		//else some nodes end up without name
+		for (int i = 0; i < Network.size(); i++) {
+			Node node = Network.get(i);
+			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+					.getProtocol(pid);
+			protocol.performGroupNameSetting(node, pid);
+		}
+		return false;
+	}
 
 }

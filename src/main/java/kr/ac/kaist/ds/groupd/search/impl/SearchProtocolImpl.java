@@ -263,14 +263,13 @@ public class SearchProtocolImpl implements SearchProtocol {
         	//if we are gossiping we must not send it to the representative
         	gossipMessageToNeighours(node, protocolID, searchQuery);
         }
-        Node representative = getInterestProtocolFrom(node).getRepresentative();
-        if (node.equals(representative)) {
-            boolean sent = sendQueryToNeighborIfItIsInVisitedList(protocolID, representative,
+        if (isNodeRepresentative(node)) {
+            boolean sent = sendQueryToNeighborIfItIsInVisitedList(protocolID, node,
                     searchQuery);
             if (sent) {
                 return;
             }
-            Collection<Node> neighbours = getInterestProtocolFrom(representative).getNeighbours();
+            Collection<Node> neighbours = getInterestProtocolFrom(node).getNeighbours();
             // no neighbour in the visited list found, gotta check the groups
             GroupName lastNodeGroupName = getGroupNameProtocolFrom(lastNode).getGroupName();
             boolean sentToGroup = sendQueryToNeighbourInGroupInVisitedList(protocolID, neighbours,
@@ -293,11 +292,21 @@ public class SearchProtocolImpl implements SearchProtocol {
         } else {
             // send query to representative because we do not know where to send
             // it
-            getSearchProtocolFrom(protocolID, representative).addSearchQuery(searchQuery);
+            Node representative = getInterestProtocolFrom(node).getRepresentative();
+			getSearchProtocolFrom(protocolID, representative).addSearchQuery(searchQuery);
         }
     }
 
-    /**
+    private boolean isNodeRepresentative(Node node) {
+    	InterestProtocol interestProtocolFrom = getInterestProtocolFrom(node);
+		return interestProtocolFrom.getNeighbours().stream()
+                .filter(n -> node
+                        .equals(getInterestProtocolFrom(n).getRepresentative()))
+                        .findAny()
+                        .isPresent();
+	}
+
+	/**
      * Retrieves the search protocol from the given node. Since we are the
      * {@link SearchProtocol} ourselves here, we do not have the pid in a field,
      * but pass it to every method from the {@link #nextCycle(Node, int)}
@@ -349,10 +358,11 @@ public class SearchProtocolImpl implements SearchProtocol {
             SearchQuery searchQuery) {
         Collection<Node> neighbours = getInterestProtocolFrom(representative).getNeighbours();
         for (Node n : neighbours) {
-            if (searchQuery.getVisitedNodes().contains(n)) {
-                int indexOf = searchQuery.getVisitedNodes().indexOf(n);
-                Node nextHop = searchQuery.getVisitedNodes().get(indexOf);
-                searchQuery.getVisitedNodes().subList(0, indexOf).clear();
+            List<Node> visitedNodes = searchQuery.getVisitedNodes();
+			if (visitedNodes.contains(n)) {
+                int indexOf = visitedNodes.indexOf(n);
+                Node nextHop = visitedNodes.get(indexOf);
+                visitedNodes.subList(indexOf, visitedNodes.size() - 1).clear();
                 getSearchProtocolFrom(protocolID, nextHop).addSearchQuery(searchQuery);
                 return true;
             }
