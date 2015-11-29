@@ -62,7 +62,6 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @return
      */
     private Queue<SearchQuery> createQueue() {
-//        return MinMaxPriorityQueue.<SearchQuery>orderedBy((q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward())).maximumSize(queueSize).create();
         return new SearchQueryPriorityQueue<>(queueSize, (q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward()));
     }
 
@@ -75,6 +74,7 @@ public class SearchProtocolImpl implements SearchProtocol {
         // target reached return the start source.
         if (isDestinationReached(node, searchQuery)) {
             searchQuery.setBackward(true);
+            searchQuery.getOrangeNodes().clear();
             // put it back in, because we removed it
             addSearchQuery(searchQuery);
 //            Logger.getLogger(getClass().getName()).info("Destination found");
@@ -91,13 +91,7 @@ public class SearchProtocolImpl implements SearchProtocol {
         // while Pm is not the last peer in the search path do
         if (!neighbours.isEmpty() || !hasNodeAlreadyBeenVisited(node, searchQuery)) {
             // Send Mq to the neighbrs in the set S = { s1..}
-            List<Node> orangeNodes = sendQueryToNeighboursWithProbability(node, pid, searchQuery);
-
-            // line 5 - 9
-            Node neighbourWithHighestDegree = findNeighbourWithHighestDegree(node, pid);
-            SearchProtocol searchProtocol = getSearchProtocolFrom(pid, neighbourWithHighestDegree);
-            SearchQuery query = copySearchQuery(node, pid, orangeNodes, searchQuery);
-            searchProtocol.addSearchQuery(query);
+            gossipMessageToNeighours(node, pid, searchQuery);
         } else {
             Node neighbourWithSecondHighestDegree = findNeighbourWithSecondHighestDegree(node, pid);
             if (hasNodeAlreadyBeenVisited(neighbourWithSecondHighestDegree, searchQuery)) {
@@ -108,6 +102,24 @@ public class SearchProtocolImpl implements SearchProtocol {
             }
         }
     }
+
+    /**
+     * Sends the message to the neighbours with the probability {@link #probabilityPk}
+     * and forwards it also to the highest degree neighbour.
+     * @param node
+     * @param pid
+     * @param searchQuery
+     */
+	private void gossipMessageToNeighours(Node node, int pid,
+			SearchQuery searchQuery) {
+		List<Node> orangeNodes = sendQueryToNeighboursWithProbability(node, pid, searchQuery);
+
+		// line 5 - 9
+		Node neighbourWithHighestDegree = findNeighbourWithHighestDegree(node, pid);
+		SearchProtocol searchProtocol = getSearchProtocolFrom(pid, neighbourWithHighestDegree);
+		SearchQuery query = copySearchQuery(node, pid, orangeNodes, searchQuery);
+		searchProtocol.addSearchQuery(query);
+	}
 
     private boolean isSearchBackAtSource(Node node, SearchQuery searchQuery) {
         return node.getID() == searchQuery.getSource() && !searchQuery.getVisitedNodes().isEmpty();
@@ -242,8 +254,14 @@ public class SearchProtocolImpl implements SearchProtocol {
         Node lastNode = searchQuery.getVisitedNodes().get(searchQuery.getVisitedNodes().size() - 1);
         InterestProtocol interestProtcol = getInterestProtocolFrom(node);
         if (interestProtcol.getNeighbours().contains(lastNode)) {
+        	//we just set it every time to false, it cannot hurt
+        	searchQuery.setGossiping(false);
             sendQueryToLastNode(node, protocolID, lastNode, searchQuery);
             return;
+        }
+        if(searchQuery.isGossiping()){
+        	//if we are gossiping we must not send it to the representative
+        	gossipMessageToNeighours(node, protocolID, searchQuery);
         }
         Node representative = getInterestProtocolFrom(node).getRepresentative();
         if (node.equals(representative)) {
@@ -268,7 +286,10 @@ public class SearchProtocolImpl implements SearchProtocol {
                 return;
             }
             // worst case go back to gossiping until we are back on track
-            // TODO
+            StatisticsCollector.fellBackToGossiping();
+            searchQuery.setGossiping(true);
+            searchQuery.getOrangeNodes().clear();
+            gossipMessageToNeighours(node, protocolID, searchQuery);
         } else {
             // send query to representative because we do not know where to send
             // it

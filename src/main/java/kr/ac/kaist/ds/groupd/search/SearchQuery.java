@@ -45,6 +45,11 @@ public class SearchQuery {
     private int movedInRound = -1;
 
     private int backTrackHops;
+    
+    /**
+     * If on its way this query is off-track, we have to gossip it.
+     */
+    private boolean gossiping = false;
 
     /**
      * Copy constructor
@@ -61,6 +66,7 @@ public class SearchQuery {
         this.creationRound = q.creationRound;
         // because of the cloning we will just assume, that it will be moved immediately
         this.movedInRound = CommonState.getIntTime();
+        this.gossiping = q.gossiping;
         StatisticsCollector.queryCreated();
     }
 
@@ -149,6 +155,14 @@ public class SearchQuery {
     
     public int getBacktrackHops(){
         return backTrackHops;
+    }
+    
+    public boolean isGossiping(){
+    	return gossiping;
+    }
+    
+    public void setGossiping(boolean b){
+    	this.gossiping = b;
     }
 
 }

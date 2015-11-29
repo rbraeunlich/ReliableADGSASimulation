@@ -12,6 +12,8 @@ public class StatisticsCollector {
     static IncrementalStats hopsBackToSource = new IncrementalStats();
 
     static IncrementalStats searchQueriesCreated = new IncrementalStats();
+    
+    static IncrementalStats gossipUsedForBacktracking = new IncrementalStats();
 
     public static void arrivedAtDestination(int nrOfHops, int nrOfGroups) {
         hopsToDestination.add(nrOfHops);
@@ -26,4 +28,7 @@ public class StatisticsCollector {
         searchQueriesCreated.add(1);
     }
 
+    public static void fellBackToGossiping(){
+    	gossipUsedForBacktracking.add(1);
+    }
 }

@@ -15,7 +15,7 @@ public class StaticGroupNameProtocol implements GroupNameProtocol {
 	private int interestProtocolPid;
 
 	public StaticGroupNameProtocol(String prefix) {
-		this.interestProtocolPid = Configuration.getPid(prefix
+		this.interestProtocolPid = Configuration.getPid(prefix + "."
 				+ PAR_INTEREST_GROUP_PROTOCOL);
 	}
 
