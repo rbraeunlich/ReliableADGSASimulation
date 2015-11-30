@@ -24,6 +24,7 @@ public class Manager implements Control {
     private static final String PAR_TIME_RANGE_END_MS = "end";
 
     private static final String PAR_INTEREST_GROUP_PROTOCOL = "interestgroup";
+
     private static final String PAR_SEARCH_PROTOCOL = "search";
 
     private static final String PAR_INIT = "init";
@@ -41,7 +42,7 @@ public class Manager implements Control {
     private Long interval;
 
     private NodeInitializer[] inits;
-    
+
     private boolean searchStarted = false;
 
     private int searchProtocolPid;
@@ -68,7 +69,6 @@ public class Manager implements Control {
         Node node = insertNewNodeIntoNetwork();
         InterestProtocol interestGroupProtocol = (InterestProtocol)node
                 .getProtocol(interestGroupPid);
-        //TODO should we also start the election for other nodes?
         interestGroupProtocol.startElection();
     }
 
@@ -101,14 +101,14 @@ public class Manager implements Control {
     }
 
     /**
-     * Since the similarity is commutative, we do not need to check all nodes in the network
+     * Since the similarity is commutative, we do not need to check all nodes in
+     * the network
      */
     private void removeNodeFromAllOldNeigbours(Node removedNode,
             InterestProtocol oldNodeInterestGroupProtocol) {
         Collection<Node> neighbours = oldNodeInterestGroupProtocol.getNeighbours();
-        neighbours.stream()
-            .map(n -> (InterestProtocol)n.getProtocol(interestGroupPid))
-            .forEach(p -> p.removeNeighbour(removedNode));
+        neighbours.stream().map(n -> (InterestProtocol)n.getProtocol(interestGroupPid))
+                .forEach(p -> p.removeNeighbour(removedNode));
     }
 
     /**
@@ -122,11 +122,17 @@ public class Manager implements Control {
             long fraction = (long)(range * rand.nextDouble());
             interval = fraction + startRangeMs;
         }
-        if (new Date().getTime() - startTime.getTime() >= interval) {
+        long timeDifference = new Date().getTime() - startTime.getTime();
+        if (timeDifference >= interval) {
+            double nrOfNodesToChange = Math.ceil(timeDifference / interval);
             interval = null;
-            changeNetwork();
+            //because PeerSims round model does not fit our aim to use a time interval
+            //it is possible that we have to change several nodes
+            for (int i = 0; i < nrOfNodesToChange; i++) {
+                changeNetwork();
+            }
         }
-        if(!searchStarted){
+        if (!searchStarted) {
             Random random = new Random();
             int destination = random.nextInt(6040);
             int source = random.nextInt(6040);
