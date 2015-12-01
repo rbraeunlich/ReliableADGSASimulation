@@ -11,4 +11,6 @@ public interface SearchProtocol extends CDProtocol {
      */
     void addSearchQuery(SearchQuery searchQuery);
 
+    boolean isQueueFull();
+
 }

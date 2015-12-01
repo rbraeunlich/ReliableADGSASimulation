@@ -51,6 +51,8 @@ public class SearchQuery {
      */
     private boolean gossiping = false;
 
+    private int id;
+
     /**
      * Copy constructor
      * 
@@ -67,10 +69,11 @@ public class SearchQuery {
         // because of the cloning we will just assume, that it will be moved immediately
         this.movedInRound = CommonState.getIntTime();
         this.gossiping = q.gossiping;
-        StatisticsCollector.queryCreated();
+        this.id = q.id;
+        StatisticsCollector.queryCreated(q.id);
     }
 
-    public SearchQuery(int source, int destination, int creationRound) {
+    public SearchQuery(int source, int destination, int creationRound, int messageId) {
         this.source = source;
         this.destination = destination;
         this.backward = false;
@@ -78,7 +81,8 @@ public class SearchQuery {
         this.visitedGroups = new LinkedHashSet<>();
         this.orangeNodes = new HashMap<Long, Collection<Node>>();
         this.creationRound = creationRound;
-        StatisticsCollector.queryCreated();
+        this.id = messageId;
+        StatisticsCollector.queryCreated(messageId);
     }
 
     public List<Node> getVisitedNodes() {
@@ -163,6 +167,10 @@ public class SearchQuery {
     
     public void setGossiping(boolean b){
     	this.gossiping = b;
+    }
+
+    public int getId() {
+        return id;
     }
 
 }

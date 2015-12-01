@@ -28,6 +28,8 @@ public class Manager implements Control {
     private static final String PAR_SEARCH_PROTOCOL = "search";
 
     private static final String PAR_INIT = "init";
+    
+    private static final String PAR_MESSAGE_CYCLE = "messagecycle";
 
     private long startRangeMs;
 
@@ -43,15 +45,24 @@ public class Manager implements Control {
 
     private NodeInitializer[] inits;
 
-    private boolean searchStarted = false;
-
     private int searchProtocolPid;
+
+    /**
+     * Determines in which cycles a new search query will be started.
+     */
+    private int messageCycle;
+    
+    /**
+     * The most simple way to give every search query an idea. Of course not threadsafe...
+     */
+    private int messageId = 0;
 
     public Manager(String prefix) {
         this.startRangeMs = Configuration.getLong(prefix + "." + PAR_TIME_RANGE_START_MS);
         this.endRangeMs = Configuration.getLong(prefix + "." + PAR_TIME_RANGE_END_MS);
         this.interestGroupPid = Configuration.getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
         this.searchProtocolPid = Configuration.getPid(prefix + "." + PAR_SEARCH_PROTOCOL);
+        this.messageCycle = Configuration.getInt(prefix + "." + PAR_MESSAGE_CYCLE);
         this.rand = new Random();
         Object[] tmp = Configuration.getInstanceArray(prefix + "." + PAR_INIT);
         inits = new NodeInitializer[tmp.length];
@@ -132,14 +143,14 @@ public class Manager implements Control {
                 changeNetwork();
             }
         }
-        if (!searchStarted) {
+        if (CommonState.getIntTime() % messageCycle == 0) {
             Random random = new Random();
             int destination = random.nextInt(6040);
             int source = random.nextInt(6040);
             Node node = Network.get(source);
             SearchProtocol protocol = (SearchProtocol)node.getProtocol(searchProtocolPid);
-            protocol.addSearchQuery(new SearchQuery(source, destination, CommonState.getIntTime()));
-            searchStarted = true;
+            protocol.addSearchQuery(new SearchQuery(source, destination, CommonState.getIntTime(), messageId));
+            messageId++;
         }
         return false;
     }

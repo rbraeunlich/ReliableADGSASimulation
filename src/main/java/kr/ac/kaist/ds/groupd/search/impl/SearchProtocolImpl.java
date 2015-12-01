@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import kr.ac.kaist.ds.groupd.groupname.GroupName;
@@ -247,8 +246,7 @@ public class SearchProtocolImpl implements SearchProtocol {
     private void performBacktracking(Node node, int protocolID, SearchQuery searchQuery) {
         searchQuery.addBacktrackHop();
         if (node.getID() == searchQuery.getSource()) {
-            Logger.getLogger(this.getClass().getName()).info("back home!");
-            StatisticsCollector.arrivedBackAtSource(searchQuery.getBacktrackHops());
+            StatisticsCollector.arrivedBackAtSource(searchQuery.getBacktrackHops(), searchQuery.getId());
             return;
         }
         Node lastNode = searchQuery.getVisitedNodes().get(searchQuery.getVisitedNodes().size() - 1);
@@ -428,6 +426,11 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private boolean isTimeOver(SearchQuery searchQuery) {
         return searchQuery.getCreationRound() + quertyTtl <= CommonState.getIntTime();
+    }
+
+    @Override
+    public boolean isQueueFull() {
+        return searchQueries.size() == queueSize;
     }
 
 }

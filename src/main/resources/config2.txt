@@ -23,8 +23,8 @@ protocol.search kr.ac.kaist.ds.groupd.search.impl.SearchProtocolImpl
 protocol.search.naming name
 protocol.search.interestgroup interest
 protocol.search.prob 0.1
-protocol.search.query.ttl 20
-protocol.search.queue.size 20
+protocol.search.query.ttl 10
+protocol.search.queue.size 45
 
 ################### initialization ======================
 
@@ -48,6 +48,7 @@ control.degree.method list
 
 control.0 kr.ac.kaist.ds.groupd.managing.Manager
 control.0.search search
+control.0.messagecycle 3
 control.0.start 4
 control.0.end 9000
 control.0.interestgroup interest
@@ -64,6 +65,7 @@ control.0.init.0.undir
 
 control.stats kr.ac.kaist.ds.groupd.statistics.StatisticsPrinter
 control.stats.FINAL
+control.stats.search search
 
 
 include.control 0 stats #1 degree
