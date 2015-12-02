@@ -22,6 +22,10 @@ import peersim.config.Configuration;
 import peersim.core.CommonState;
 import peersim.core.Node;
 
+/**
+ * Search protocol that does the forward and backward search with ADGSA, without
+ * using the list of visited nodes. In the queue, all quries have the same priority.
+ */
 public class SearchProtocolImpl2 implements SearchProtocol {
 
     private static final String PAR_NAME_PROTOCOL = "naming";
