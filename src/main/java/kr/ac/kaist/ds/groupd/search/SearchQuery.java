@@ -20,7 +20,7 @@ public class SearchQuery {
     private final int source;
 
     // destination node
-    private final int destination;
+    private int destination;
 
     /**
      * The round in which the search message was created
@@ -172,5 +172,12 @@ public class SearchQuery {
     public int getId() {
         return id;
     }
+
+    /**
+     * Sets the destination. Is needed for the ADGSA backtracking.
+     */
+	public void setDestination(int newDestination) {
+		this.destination = newDestination;
+	}
 
 }
