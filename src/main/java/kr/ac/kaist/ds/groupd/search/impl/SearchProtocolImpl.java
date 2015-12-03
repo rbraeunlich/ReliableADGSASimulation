@@ -77,7 +77,7 @@ public class SearchProtocolImpl implements SearchProtocol {
             // put it back in, because we removed it
             addSearchQuery(searchQuery);
 //            Logger.getLogger(getClass().getName()).info("Destination found");
-            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size());
+            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size(), searchQuery.getId());
             return;
         }
         if (isSearchBackAtSource(node, searchQuery)) {

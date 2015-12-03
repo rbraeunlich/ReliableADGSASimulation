@@ -22,9 +22,12 @@ public class StatisticsCollector {
 
     static Set<Integer> returnedUniqueMessageIds = new HashSet<>();
 
-    public static void arrivedAtDestination(int nrOfHops, int nrOfGroups) {
+    static Set<Integer> destinationUniqueMessageIds = new HashSet<>();
+
+    public static void arrivedAtDestination(int nrOfHops, int nrOfGroups, int id) {
         hopsToDestination.add(nrOfHops);
         groupsToDestination.add(nrOfGroups);
+        destinationUniqueMessageIds.add(id);
     }
 
     public static void arrivedBackAtSource(int nrOfHops, int messageId) {
