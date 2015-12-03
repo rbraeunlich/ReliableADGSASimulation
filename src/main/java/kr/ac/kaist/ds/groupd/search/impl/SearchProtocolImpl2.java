@@ -23,12 +23,10 @@ import peersim.core.CommonState;
 import peersim.core.Node;
 
 /**
- * Search protocol that performs the forward search with ADGSA and uses
- * the visited nodes list for backtracking. In the queue, the backtracking 
- * quries have priority.
- *
+ * Search protocol that does the forward and backward search with ADGSA, without
+ * using the list of visited nodes. In the queue, all quries have the same priority.
  */
-public class SearchProtocolImpl implements SearchProtocol {
+public class SearchProtocolImpl2 implements SearchProtocol {
 
     private static final String PAR_NAME_PROTOCOL = "naming";
 
@@ -52,7 +50,7 @@ public class SearchProtocolImpl implements SearchProtocol {
 
     private int queueSize;
     
-    public SearchProtocolImpl(String prefix) {
+    public SearchProtocolImpl2(String prefix) {
         this.namingProtocolPid = Configuration.getPid(prefix + "." + PAR_NAME_PROTOCOL);
         this.interestGroupProtocolPid = Configuration
                 .getPid(prefix + "." + PAR_INTEREST_GROUP_PROTOCOL);
@@ -67,7 +65,7 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @return
      */
     private Queue<SearchQuery> createQueue() {
-        return new SearchQueryPriorityQueue<>(queueSize, (q1, q2) -> Boolean.compare(q1.isBackward(), q2.isBackward()));
+        return new SearchQueryPriorityQueue<>(queueSize, (q1, q2) -> 0);
     }
 
     /**
@@ -76,14 +74,20 @@ public class SearchProtocolImpl implements SearchProtocol {
      * @param searchQuery
      */
     private void performSearch(Node node, int pid, SearchQuery searchQuery) {
+    	// ADGSA backtracking complete
+    	if(isDestinationReached(node, searchQuery) && searchQuery.getSource() == searchQuery.getDestination()){
+    		StatisticsCollector.arrivedBackAtSource(searchQuery.getBacktrackHops(), searchQuery.getId());
+    		return;
+    	}
         // target reached return the start source.
         if (isDestinationReached(node, searchQuery)) {
-            searchQuery.setBackward(true);
-            searchQuery.getOrangeNodes().clear();
+        	int source = searchQuery.getSource();
+        	searchQuery.setDestination(source);
+        	searchQuery.getOrangeNodes().clear();
             // put it back in, because we removed it
             addSearchQuery(searchQuery);
 //            Logger.getLogger(getClass().getName()).info("Destination found");
-            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size(), searchQuery.getId());
+            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size());
             return;
         }
         if (isSearchBackAtSource(node, searchQuery)) {
@@ -401,7 +405,7 @@ public class SearchProtocolImpl implements SearchProtocol {
     @Override
     public Object clone() {
         try {
-            SearchProtocolImpl clone = (SearchProtocolImpl)super.clone();
+            SearchProtocolImpl2 clone = (SearchProtocolImpl2)super.clone();
             clone.searchQueries = createQueue();
             return clone;
         } catch (CloneNotSupportedException e) {
@@ -422,11 +426,8 @@ public class SearchProtocolImpl implements SearchProtocol {
             if (isTimeOver(searchQuery)) {
                 continue;
             }
-            if (searchQuery.isBackward()) {
-                performBacktracking(node, protocolID, searchQuery);
-            } else {
-                performSearch(node, protocolID, searchQuery);
-            }
+            //no difference between forward and backward
+            performSearch(node, protocolID, searchQuery);
         }
     }
 
