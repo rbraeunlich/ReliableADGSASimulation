@@ -187,6 +187,7 @@ public class InterestProtocolImpl implements InterestProtocol {
                 .forEach(p -> p.setGroupName(groupName));
     }
 
+    @Override
     public void startCommunityFormation(Node node, int protocolID) {
         createLocalCommunities(node, protocolID);
         createGlobalCommunities(node, protocolID);

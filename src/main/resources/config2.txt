@@ -14,16 +14,16 @@ protocol.name.interestgroup interest
 
 protocol.interest kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl
 protocol.interest.linkable link
-protocol.interest.coeff 0.5
-protocol.interest.candVotes 5
-protocol.interest.repThreshold 1
+protocol.interest.coeff 0.55
+protocol.interest.candVotes 7
+protocol.interest.repThreshold 25
 protocol.interest.naming name
 
 protocol.search kr.ac.kaist.ds.groupd.search.impl.SearchProtocolImpl
 protocol.search.naming name
 protocol.search.interestgroup interest
 protocol.search.prob 0.1
-protocol.search.query.ttl 10
+protocol.search.query.ttl 100
 protocol.search.queue.size 45
 
 ################### initialization ======================

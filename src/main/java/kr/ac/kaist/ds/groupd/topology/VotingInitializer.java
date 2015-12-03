@@ -1,6 +1,6 @@
 package kr.ac.kaist.ds.groupd.topology;
 
-import kr.ac.kaist.ds.groupd.interest.impl.InterestProtocolImpl;
+import kr.ac.kaist.ds.groupd.interest.InterestProtocol;
 import peersim.config.Configuration;
 import peersim.core.Control;
 import peersim.core.Network;
@@ -23,7 +23,7 @@ public class VotingInitializer implements Control {
 	public boolean execute() {
 		for (int i = 0; i < Network.size(); i++) {
 			Node node = Network.get(i);
-			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+			InterestProtocol protocol = (InterestProtocol) node
 					.getProtocol(pid);
 			protocol.startCommunityFormation(node, pid);
 		}
@@ -31,7 +31,7 @@ public class VotingInitializer implements Control {
 		//else some nodes end up without name
 		for (int i = 0; i < Network.size(); i++) {
 			Node node = Network.get(i);
-			InterestProtocolImpl protocol = (InterestProtocolImpl) node
+			InterestProtocol protocol = (InterestProtocol) node
 					.getProtocol(pid);
 			protocol.performGroupNameSetting(node, pid);
 		}

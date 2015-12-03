@@ -43,4 +43,6 @@ public interface InterestProtocol extends CDProtocol, Linkable {
 
     void performGroupNameSetting(Node node, int protocolID);
 
+    void startCommunityFormation(Node node, int protocolID);
+
 }

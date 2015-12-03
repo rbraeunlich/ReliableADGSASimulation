@@ -80,7 +80,9 @@ public class Manager implements Control {
         Node node = insertNewNodeIntoNetwork();
         InterestProtocol interestGroupProtocol = (InterestProtocol)node
                 .getProtocol(interestGroupPid);
-        interestGroupProtocol.startElection();
+        interestGroupProtocol.startCommunityFormation(node, interestGroupPid);
+        InterestProtocol protocol = (InterestProtocol)interestGroupProtocol.getRepresentative().getProtocol(interestGroupPid);
+        protocol.performGroupNameSetting(interestGroupProtocol.getRepresentative(), interestGroupPid);
     }
 
     /**
