@@ -15,6 +15,12 @@ public class StatisticsCollector {
     static IncrementalStats hopsBackToSource = new IncrementalStats();
 
     static IncrementalStats searchQueriesCreated = new IncrementalStats();
+
+    static IncrementalStats nodeIdUsedForBacktracking = new IncrementalStats();
+
+    static IncrementalStats groupIdUsedForBacktracking = new IncrementalStats();
+
+    static IncrementalStats representativeUsedForBacktracking = new IncrementalStats();
     
     static IncrementalStats gossipUsedForBacktracking = new IncrementalStats();
     
@@ -40,7 +46,19 @@ public class StatisticsCollector {
         searchQueriesCreated.add(1);
     }
 
-    public static void fellBackToGossiping(){
+    public static void backtrackingUsedGossiping(){
     	gossipUsedForBacktracking.add(1);
+    }
+    
+    public static void backtrackingUsedNode(){
+        nodeIdUsedForBacktracking.add(1);
+    }
+    
+    public static void backtrackingUsedGroup(){
+        groupIdUsedForBacktracking.add(1);
+    }
+    
+    public static void backtrackingUsedRepresentative(){
+        representativeUsedForBacktracking.add(1);
     }
 }

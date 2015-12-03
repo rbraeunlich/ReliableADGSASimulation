@@ -87,7 +87,7 @@ public class SearchProtocolImpl2 implements SearchProtocol {
             // put it back in, because we removed it
             addSearchQuery(searchQuery);
 //            Logger.getLogger(getClass().getName()).info("Destination found");
-            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size());
+            StatisticsCollector.arrivedAtDestination(searchQuery.getVisitedNodes().size(), searchQuery.getVisitedGroups().size(), searchQuery.getId());
             return;
         }
         if (isSearchBackAtSource(node, searchQuery)) {
@@ -293,7 +293,7 @@ public class SearchProtocolImpl2 implements SearchProtocol {
                 return;
             }
             // worst case go back to gossiping until we are back on track
-            StatisticsCollector.fellBackToGossiping();
+            StatisticsCollector.backtrackingUsedGossiping();
             searchQuery.setGossiping(true);
             searchQuery.getOrangeNodes().clear();
             gossipMessageToNeighours(node, protocolID, searchQuery);

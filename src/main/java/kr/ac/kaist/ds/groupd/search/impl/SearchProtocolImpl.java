@@ -258,12 +258,14 @@ public class SearchProtocolImpl implements SearchProtocol {
         Node lastNode = searchQuery.getVisitedNodes().get(searchQuery.getVisitedNodes().size() - 1);
         InterestProtocol interestProtcol = getInterestProtocolFrom(node);
         if (interestProtcol.getNeighbours().contains(lastNode)) {
+            StatisticsCollector.backtrackingUsedNode();
         	//we just set it every time to false, it cannot hurt
         	searchQuery.setGossiping(false);
             sendQueryToLastNode(node, protocolID, lastNode, searchQuery);
             return;
         }
         if(searchQuery.isGossiping()){
+            StatisticsCollector.backtrackingUsedGossiping();
         	//if we are gossiping we must not send it to the representative
         	gossipMessageToNeighours(node, protocolID, searchQuery);
         }
@@ -279,6 +281,7 @@ public class SearchProtocolImpl implements SearchProtocol {
             boolean sentToGroup = sendQueryToNeighbourInGroupInVisitedList(protocolID, neighbours,
                     lastNodeGroupName, searchQuery);
             if (sentToGroup) {
+                StatisticsCollector.backtrackingUsedGroup();
                 return;
             }
             // no group visible from here, gotta check the groups of my
@@ -289,13 +292,14 @@ public class SearchProtocolImpl implements SearchProtocol {
                 return;
             }
             // worst case go back to gossiping until we are back on track
-            StatisticsCollector.fellBackToGossiping();
+            StatisticsCollector.backtrackingUsedGossiping();
             searchQuery.setGossiping(true);
             searchQuery.getOrangeNodes().clear();
             gossipMessageToNeighours(node, protocolID, searchQuery);
         } else {
             // send query to representative because we do not know where to send
             // it
+            StatisticsCollector.backtrackingUsedRepresentative();
             Node representative = getInterestProtocolFrom(node).getRepresentative();
 			getSearchProtocolFrom(protocolID, representative).addSearchQuery(searchQuery);
         }
