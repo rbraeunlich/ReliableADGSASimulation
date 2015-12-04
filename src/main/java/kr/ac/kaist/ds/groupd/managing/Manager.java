@@ -146,9 +146,10 @@ public class Manager implements Control {
             }
         }
         if (CommonState.getIntTime() % messageCycle == 0) {
+            int networkSize = Configuration.getInt("network.size");
             Random random = new Random();
-            int destination = random.nextInt(6040);
-            int source = random.nextInt(6040);
+            int destination = random.nextInt(networkSize);
+            int source = random.nextInt(networkSize);
             Node node = Network.get(source);
             SearchProtocol protocol = (SearchProtocol)node.getProtocol(searchProtocolPid);
             protocol.addSearchQuery(new SearchQuery(source, destination, CommonState.getIntTime(), messageId));
