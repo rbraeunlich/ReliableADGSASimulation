@@ -1,13 +1,13 @@
 simulation.cycles 100
 #the number of users in the movielens 1 mio. dataset
-network.size 6040
+network.size 750
 
 default.connections 10
 ################### protocols ===========================
 
 protocol.link IdleProtocol
 
-protocol.name kr.ac.kaist.ds.groupd.groupname.impl.DynamicGroupNameProtocol
+protocol.name kr.ac.kaist.ds.groupd.groupname.impl.StaticGroupNameProtocol
 protocol.name.bits 8
 protocol.name.similarity 0.6
 protocol.name.interestgroup interest
@@ -49,8 +49,9 @@ control.degree.method list
 control.0 kr.ac.kaist.ds.groupd.managing.Manager
 control.0.search search
 control.0.messagecycle 3
-control.0.start 4
-control.0.end 9000
+control.0.start 100
+control.0.end 100
+control.0.nodechange 2
 control.0.interestgroup interest
 #the new nodes are connected with existing nodes based on RandNI. WireKOut does not work
 control.0.init.0 RandNI
