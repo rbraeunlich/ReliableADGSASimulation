@@ -70,6 +70,7 @@ public class SearchQuery {
         this.movedInRound = CommonState.getIntTime();
         this.gossiping = q.gossiping;
         this.id = q.id;
+        this.backTrackHops = q.backTrackHops;
         StatisticsCollector.queryCreated(q.id);
     }
 
