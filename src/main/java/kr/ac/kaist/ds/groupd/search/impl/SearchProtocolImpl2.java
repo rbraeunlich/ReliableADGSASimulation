@@ -79,6 +79,9 @@ public class SearchProtocolImpl2 implements SearchProtocol {
     		StatisticsCollector.arrivedBackAtSource(searchQuery.getBacktrackHops(), searchQuery.getId());
     		return;
     	}
+    	if(searchQuery.getSource() == searchQuery.getDestination()){
+    		searchQuery.addBacktrackHop();
+    	}
         // target reached return the start source.
         if (isDestinationReached(node, searchQuery)) {
         	int source = searchQuery.getSource();
