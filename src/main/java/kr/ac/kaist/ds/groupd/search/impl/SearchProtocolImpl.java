@@ -273,6 +273,7 @@ public class SearchProtocolImpl implements SearchProtocol {
             boolean sent = sendQueryToNeighborIfItIsInVisitedList(protocolID, node,
                     searchQuery);
             if (sent) {
+            	StatisticsCollector.backtrackingRepresentativeUsedNodeFromList();
                 return;
             }
             Collection<Node> neighbours = getInterestProtocolFrom(node).getNeighbours();
@@ -289,6 +290,7 @@ public class SearchProtocolImpl implements SearchProtocol {
             boolean sentToNeighboursNeighbours = tryToSendQueryToNeighboursNeighbours(protocolID,
                     neighbours, lastNodeGroupName, searchQuery);
             if (sentToNeighboursNeighbours) {
+            	StatisticsCollector.backtrackingUsedNeighboursNeighbour();
                 return;
             }
             // worst case go back to gossiping until we are back on track
